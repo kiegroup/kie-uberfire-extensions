@@ -21,23 +21,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.io.IOUtils;
 import org.jboss.errai.bus.server.annotations.Service;
-import org.uberfire.io.IOService;
-import org.uberfire.java.nio.IOException;
-import org.uberfire.java.nio.file.DirectoryStream;
-import org.uberfire.java.nio.file.FileAlreadyExistsException;
-import org.uberfire.java.nio.file.FileSystem;
-import org.uberfire.java.nio.file.FileVisitResult;
-import org.uberfire.java.nio.file.NotDirectoryException;
-import org.uberfire.java.nio.file.Path;
-import org.uberfire.java.nio.file.SimpleFileVisitor;
-import org.uberfire.java.nio.file.StandardDeleteOption;
-import org.uberfire.java.nio.file.attribute.BasicFileAttributes;
-import org.uberfire.rpc.SessionInfo;
-import org.kie.uberfire.plugin.exception.PluginAlreadyExists;
 import org.kie.uberfire.plugin.event.MediaDeleted;
 import org.kie.uberfire.plugin.event.PluginAdded;
 import org.kie.uberfire.plugin.event.PluginDeleted;
 import org.kie.uberfire.plugin.event.PluginSaved;
+import org.kie.uberfire.plugin.exception.PluginAlreadyExists;
 import org.kie.uberfire.plugin.model.CodeType;
 import org.kie.uberfire.plugin.model.DynamicMenu;
 import org.kie.uberfire.plugin.model.DynamicMenuItem;
@@ -51,6 +39,18 @@ import org.kie.uberfire.plugin.model.PluginType;
 import org.kie.uberfire.plugin.model.RuntimePlugin;
 import org.kie.uberfire.plugin.service.PluginServices;
 import org.kie.uberfire.plugin.type.TypeConverterUtil;
+import org.uberfire.io.IOService;
+import org.uberfire.java.nio.IOException;
+import org.uberfire.java.nio.file.DirectoryStream;
+import org.uberfire.java.nio.file.FileAlreadyExistsException;
+import org.uberfire.java.nio.file.FileSystem;
+import org.uberfire.java.nio.file.FileVisitResult;
+import org.uberfire.java.nio.file.NotDirectoryException;
+import org.uberfire.java.nio.file.Path;
+import org.uberfire.java.nio.file.SimpleFileVisitor;
+import org.uberfire.java.nio.file.StandardDeleteOption;
+import org.uberfire.java.nio.file.attribute.BasicFileAttributes;
+import org.uberfire.rpc.SessionInfo;
 
 import static org.uberfire.backend.server.util.Paths.*;
 import static org.uberfire.commons.validation.PortablePreconditions.*;
@@ -338,7 +338,7 @@ public class PluginServicesImpl implements PluginServices {
             final Set<Media> result = new HashSet<Media>();
 
             for ( final Path path : stream ) {
-                result.add( new Media( "/" + getMediaServletURI() + pluginName + "/media/" + path.getFileName(), convert( path ) ) );
+                result.add( new Media( getMediaServletURI() + pluginName + "/media/" + path.getFileName(), convert( path ) ) );
             }
 
             return result;
