@@ -65,42 +65,10 @@ public class ColumnPicker<T> {
     }
 
     public void addColumns(List<ColumnMeta<T>> columnMetas) {
-        if (gridPreferences != null) {
-            List<GridColumnPreference> columnPreferences = gridPreferences.getColumnPreferences();
-            if (!columnPreferences.isEmpty()) {
-                for (ColumnMeta meta : columnMetas) {
-                    boolean found = false;
-                    for (int i = 0; i < gridPreferences.getColumnPreferences().size() && !found; i++) {
-                        GridColumnPreference gcp = gridPreferences.getColumnPreferences().get(i);
-                        if (gcp.getName().equals(meta.getHeader().getValue())) {
-                            meta.setVisible(true);
-                            if (gcp.getWidth() != null) {
-                                dataGrid.setColumnWidth(meta.getColumn(), gcp.getWidth());
-                            } else {
-                                dataGrid.setColumnWidth(meta.getColumn(), 100, Style.Unit.PCT);
-                            }
-                            meta.setPosition(gcp.getPosition());
-                            found = true;
-                        }
-                    }
-                    if (!found) {
-                        meta.setPosition(-1);
-                        meta.setVisible(false);
-                    }
-                }
-            } else if (gridPreferences.getGlobalPreferences() != null) {
-                for (ColumnMeta meta : columnMetas) {
-                    int position = gridPreferences.getGlobalPreferences().getInitialColumns().indexOf(meta.getHeader().getValue());
-                    if (position != -1) {
-                        meta.setVisible(true);
-                        meta.setPosition(position);
-                    } else {
-                        meta.setPosition(-1);
-                        meta.setVisible(false);
-                    }
-                }
-            }
+        for (ColumnMeta columnMeta : columnMetas) {
+            checkColumnMeta(columnMeta);
         }
+
         columnMetaList.addAll(columnMetas);
 
         sortAndAddColumns(columnMetas);
@@ -114,9 +82,45 @@ public class ColumnPicker<T> {
         }
     }
 
-    public void addColumn(final ColumnMeta<T> columnMeta) {
+    protected void checkColumnMeta(ColumnMeta<T> columnMeta) {
+        if (gridPreferences != null) {
+            List<GridColumnPreference> columnPreferences = gridPreferences.getColumnPreferences();
+            if (!columnPreferences.isEmpty()) {
+                boolean found = false;
+                for (int i = 0; i < gridPreferences.getColumnPreferences().size() && !found; i++) {
+                    GridColumnPreference gcp = gridPreferences.getColumnPreferences().get(i);
+                    if (gcp.getName().equals(columnMeta.getHeader().getValue())) {
+                        columnMeta.setVisible(true);
+                        if (gcp.getWidth() != null) {
+                            dataGrid.setColumnWidth(columnMeta.getColumn(), gcp.getWidth());
+                        } else {
+                            dataGrid.setColumnWidth(columnMeta.getColumn(), 100, Style.Unit.PCT);
+                        }
+                        columnMeta.setPosition(gcp.getPosition());
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    columnMeta.setPosition(-1);
+                    columnMeta.setVisible(false);
+                }
+            } else if (gridPreferences.getGlobalPreferences() != null) {
+                int position = gridPreferences.getGlobalPreferences().getInitialColumns().indexOf(columnMeta.getHeader().getValue());
+                if (position != -1) {
+                    columnMeta.setVisible(true);
+                    columnMeta.setPosition(position);
+                } else {
+                    columnMeta.setPosition(-1);
+                    columnMeta.setVisible(false);
+                }
+            }
+        }
+    }
+
+    public void addColumn(ColumnMeta<T> columnMeta) {
         if (columnMeta == null) return;
         if (!columnMetaList.contains(columnMeta)) columnMetaList.add(columnMeta);
+        checkColumnMeta(columnMeta);
         if (columnMeta.isVisible()) dataGrid.addColumn(columnMeta.getColumn(), columnMeta.getHeader());
     }
 
