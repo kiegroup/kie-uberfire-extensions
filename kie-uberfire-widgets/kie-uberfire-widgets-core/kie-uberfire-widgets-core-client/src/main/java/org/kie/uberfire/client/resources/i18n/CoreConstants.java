@@ -169,4 +169,7 @@ public interface CoreConstants
     String ArtifactIdHolder();
     
     String VersionHolder();
+
+    String IndexClonedRepositoryWarning();
+
 }

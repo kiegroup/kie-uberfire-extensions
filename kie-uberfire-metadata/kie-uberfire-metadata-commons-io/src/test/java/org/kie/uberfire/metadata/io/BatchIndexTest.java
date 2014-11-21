@@ -35,6 +35,7 @@ import org.kie.uberfire.metadata.backend.lucene.LuceneConfig;
 import org.kie.uberfire.metadata.backend.lucene.LuceneConfigBuilder;
 import org.kie.uberfire.metadata.backend.lucene.index.LuceneIndex;
 import org.kie.uberfire.metadata.engine.Index;
+import org.kie.uberfire.metadata.engine.Observer;
 import org.uberfire.io.IOService;
 import org.uberfire.io.attribute.DublinCoreView;
 import org.uberfire.io.impl.IOServiceDotFileImpl;
@@ -59,6 +60,25 @@ public class BatchIndexTest {
             ioService = new IOServiceDotFileImpl();
         }
         return ioService;
+    }
+
+    public static Observer observer() {
+        return new Observer() {
+            @Override
+            public void information( final String message ) {
+                //Do nothing
+            }
+
+            @Override
+            public void warning( final String message ) {
+                //Do nothing
+            }
+
+            @Override
+            public void error( final String message ) {
+                //Do nothing
+            }
+        };
     }
 
     @BeforeClass
@@ -190,6 +210,7 @@ public class BatchIndexTest {
 
         new BatchIndex( config.getIndexEngine(),
                         ioService(),
+                        observer(),
                         DublinCoreView.class ).run( ioService().get( "git://temp-repo-test/" ), new Runnable() {
             @Override
             public void run() {
