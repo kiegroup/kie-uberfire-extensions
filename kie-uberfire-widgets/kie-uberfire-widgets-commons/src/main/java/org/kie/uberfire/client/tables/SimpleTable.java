@@ -16,6 +16,7 @@
 
 package org.kie.uberfire.client.tables;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -185,7 +186,7 @@ public class SimpleTable<T>
         if ( !( emptyTableCaption == null || emptyTableCaption.trim().isEmpty() ) ) {
             caption = emptyTableCaption;
         }
-        dataGrid.setEmptyTableWidget( new Label( caption ) );
+        dataGrid.setEmptyTableWidget(new Label(caption));
     }
 
     public void redraw() {
@@ -199,21 +200,21 @@ public class SimpleTable<T>
 
     @Override
     public HandlerRegistration addCellPreviewHandler( final Handler<T> handler ) {
-        return dataGrid.addCellPreviewHandler( handler );
+        return dataGrid.addCellPreviewHandler(handler);
     }
 
     @Override
     public HandlerRegistration addRangeChangeHandler( final RangeChangeEvent.Handler handler ) {
-        return dataGrid.addRangeChangeHandler( handler );
+        return dataGrid.addRangeChangeHandler(handler);
     }
 
     @Override
     public HandlerRegistration addRowCountChangeHandler( final RowCountChangeEvent.Handler handler ) {
-        return dataGrid.addRowCountChangeHandler( handler );
+        return dataGrid.addRowCountChangeHandler(handler);
     }
 
     public int getColumnIndex( Column<T, ?> column ) {
-        return dataGrid.getColumnIndex( column );
+        return dataGrid.getColumnIndex(column);
     }
 
     /**
@@ -221,7 +222,7 @@ public class SimpleTable<T>
      * @param handler
      */
     public HandlerRegistration addColumnSortHandler( final ColumnSortEvent.Handler handler ) {
-        return this.dataGrid.addColumnSortHandler( handler );
+        return this.dataGrid.addColumnSortHandler(handler);
     }
 
     @Override
@@ -247,8 +248,8 @@ public class SimpleTable<T>
     @Override
     public void setRowCount( final int count,
                              final boolean isExact ) {
-        dataGrid.setRowCount( count,
-                              isExact );
+        dataGrid.setRowCount(count,
+                isExact);
     }
 
     @Override
@@ -274,7 +275,7 @@ public class SimpleTable<T>
 
     @Override
     public T getVisibleItem( final int indexOnPage ) {
-        return dataGrid.getVisibleItem( indexOnPage );
+        return dataGrid.getVisibleItem(indexOnPage);
     }
 
     @Override
@@ -295,7 +296,7 @@ public class SimpleTable<T>
     }
 
     public void setRowData( final List<? extends T> values ) {
-        dataGrid.setRowData( values );
+        dataGrid.setRowData(values);
     }
 
     @Override
@@ -305,8 +306,8 @@ public class SimpleTable<T>
 
     public void setSelectionModel( final SelectionModel<? super T> selectionModel,
                                    final CellPreviewEvent.Handler<T> selectionEventManager ) {
-        dataGrid.setSelectionModel( selectionModel,
-                                    selectionEventManager );
+        dataGrid.setSelectionModel(selectionModel,
+                selectionEventManager);
     }
 
     @Override
@@ -316,20 +317,37 @@ public class SimpleTable<T>
                                               forceRangeChangeEvent );
     }
 
-    public void addColumn( final Column<T, ?> column,
-                           final String caption ) {
-        addColumn( column,
-                   caption,
-                   true );
+    public void addColumns(List<ColumnMeta<T>> columnMetas) {
+
+        for (ColumnMeta columnMeta : columnMetas) {
+            if (columnMeta.getHeader() == null) columnMeta.setHeader(getColumnHeader(columnMeta.getCaption(), columnMeta.getColumn()));
+        }
+        columnPicker.addColumns(columnMetas);
     }
 
-    public void addColumn( final Column<T, ?> column,
-                           final String caption,
-                           final boolean visible ) {
+
+    public void addColumn( Column<T, ?> column,
+                           String caption ) {
+        addColumn(column, caption, true);
+    }
+
+    public void addColumn( Column<T, ?> column,
+                           String caption,
+                           boolean visible) {
+        ColumnMeta<T> columnMeta = new ColumnMeta<T>(column, caption, visible);
+        addColumn(columnMeta);
+    }
+
+    protected void addColumn(ColumnMeta<T> columnMeta) {
+        if (columnMeta.getHeader() == null) columnMeta.setHeader(getColumnHeader(columnMeta.getCaption(), columnMeta.getColumn()));
+        columnPicker.addColumn(columnMeta);
+    }
+
+    protected ResizableMovableHeader<T> getColumnHeader(String caption, Column column) {
         final ResizableMovableHeader header = new ResizableMovableHeader<T>( caption,
-                                                                             dataGrid,
-                                                                             columnPicker,
-                                                                             column ) {
+                dataGrid,
+                columnPicker,
+                column ) {
             @Override
             protected int getTableBodyHeight() {
                 return dataGrid.getOffsetHeight();
@@ -361,9 +379,7 @@ public class SimpleTable<T>
             }
         } );
         column.setDataStoreName( caption );
-        columnPicker.addColumn( column,
-                                header,
-                                visible );
+        return header;
     }
 
     public void setColumnWidth( final Column<T, ?> column,
