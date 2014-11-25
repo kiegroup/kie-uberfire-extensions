@@ -49,7 +49,7 @@ public class CommentRowWidget extends Composite {
         comment.append( " " );
         comment.append( FORMATTER.format( event.getTimestamp() ) );
         comment.append( " " );
-        if ( !event.getDescription().isEmpty() ) {
+        if ( event.getDescription() != null && !event.getDescription().isEmpty() ) {
             comment.append( "\"" + event.getDescription() + "\"" );
         }
         addInfo.add( new Paragraph( comment.toString() ) );
