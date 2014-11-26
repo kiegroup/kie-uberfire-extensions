@@ -64,7 +64,7 @@ public class SocialTimelineWidget extends Composite {
             if ( event.hasLink() ) {
                 MessageBuilder.createCall( new RemoteCallback<Path>() {
                     public void callback( Path path ) {
-                        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getTimestamp(), event.getLinkLabel(), path, event.getAdicionalInfos() )
+                        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(), event.getTimestamp(), event.getLinkLabel(), path, event.getAdicionalInfos() )
                                 .withLinkCommand( model.getLinkCommand() );
                         SimpleItemWidget simple = GWT.create( SimpleItemWidget.class );
                         simple.init( rowModel );
@@ -72,7 +72,7 @@ public class SocialTimelineWidget extends Composite {
                     }
                 }, VFSService.class ).get( event.getLinkTarget() );
             } else {
-                SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getTimestamp(), event.getDescription(), event.getAdicionalInfos() );
+                SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(), event.getTimestamp(), event.getDescription(), event.getAdicionalInfos() );
                 SimpleItemWidget simple = GWT.create( SimpleItemWidget.class );
                 simple.init( rowModel );
                 itemsPanel.add( simple );

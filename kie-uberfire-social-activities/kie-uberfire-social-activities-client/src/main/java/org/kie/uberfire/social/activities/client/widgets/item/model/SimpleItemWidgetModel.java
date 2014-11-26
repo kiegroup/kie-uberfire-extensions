@@ -23,10 +23,12 @@ public class SimpleItemWidgetModel {
     private String itemDescription;
     private String title;
     private boolean withFileIcon;
+    private String eventType;
     private List<ClientResourceType> resourceTypes;
-    private ParameterizedCommand<String> linkCommand;
+    private ParameterizedCommand<LinkCommandParams> linkCommand;
 
     public SimpleItemWidgetModel( SimpleSocialTimelineWidgetModel model,
+                                  String eventType,
                                   Date timestamp,
                                   String linkText,
                                   Path linkPath,
@@ -35,6 +37,7 @@ public class SimpleItemWidgetModel {
         this.socialUser = model.getSocialUser();
         this.resourceTypes = model.getResourceTypes();
         this.placeManager = model.getPlaceManager();
+        this.eventType = eventType;
         this.timestamp = timestamp;
         this.linkText = linkText;
         this.linkPath = linkPath;
@@ -47,10 +50,12 @@ public class SimpleItemWidgetModel {
     }
 
     public SimpleItemWidgetModel( SimpleSocialTimelineWidgetModel model,
+                                  String eventType,
                                   Date timestamp,
                                   String description,
                                   String itemDescription ) {
         this.socialUser = model.getSocialUser();
+        this.eventType = eventType;
         this.timestamp = timestamp;
         this.description = description;
         this.itemDescription = itemDescription;
@@ -58,12 +63,14 @@ public class SimpleItemWidgetModel {
     }
 
     public SimpleItemWidgetModel( SocialTimelineWidgetModel model,
+                                  String eventType,
                                   Date timestamp,
                                   String linkText,
                                   Path linkPath,
                                   String itemDescription ) {
         this.socialUser = model.getSocialUser();
         this.placeManager = model.getPlaceManager();
+        this.eventType = eventType;
         this.timestamp = timestamp;
         this.linkText = linkText;
         this.linkPath = linkPath;
@@ -71,10 +78,12 @@ public class SimpleItemWidgetModel {
     }
 
     public SimpleItemWidgetModel( SocialTimelineWidgetModel model,
+                                  String eventType,
                                   Date timestamp,
                                   String description,
                                   String itemDescription ) {
         this.socialUser = model.getSocialUser();
+        this.eventType = eventType;
         this.timestamp = timestamp;
         this.description = description;
         this.itemDescription = itemDescription;
@@ -136,16 +145,24 @@ public class SimpleItemWidgetModel {
         return resourceTypes;
     }
 
-    public SimpleItemWidgetModel withLinkCommand( ParameterizedCommand<String> linkCommand ) {
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType( String eventType ) {
+        this.eventType = eventType;
+    }
+
+    public SimpleItemWidgetModel withLinkCommand( ParameterizedCommand<LinkCommandParams> linkCommand ) {
         this.linkCommand = linkCommand;
         return this;
     }
 
-    public ParameterizedCommand<String> getLinkCommand() {
+    public ParameterizedCommand<LinkCommandParams> getLinkCommand() {
         if(linkCommand==null){
-            return new ParameterizedCommand<String>() {
+            return new ParameterizedCommand<LinkCommandParams>() {
                 @Override
-                public void execute( String parameter ) {
+                public void execute( LinkCommandParams parameters ) {
 
                 }
             };

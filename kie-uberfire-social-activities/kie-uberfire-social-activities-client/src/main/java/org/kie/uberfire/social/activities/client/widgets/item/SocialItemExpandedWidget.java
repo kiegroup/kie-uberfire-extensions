@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
+import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SocialItemExpandedWidgetModel;
 import org.kie.uberfire.social.activities.client.widgets.timeline.regular.model.UpdateItem;
 import org.kie.uberfire.social.activities.model.SocialUser;
@@ -84,7 +85,7 @@ public class SocialItemExpandedWidget extends Composite {
         link.addClickHandler( new ClickHandler() {
             @Override
             public void onClick( ClickEvent event ) {
-                model.getModel().getLinkCommand().execute( updateItem.getEvent().getLinkTarget() );
+                model.getModel().getLinkCommand().execute( new LinkCommandParams( updateItem.getEvent().getType(), updateItem.getEvent().getLinkTarget() ) );
             }
         } );
         list.add( link );

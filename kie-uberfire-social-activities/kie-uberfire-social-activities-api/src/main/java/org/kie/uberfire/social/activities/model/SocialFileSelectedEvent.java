@@ -7,13 +7,20 @@ public class SocialFileSelectedEvent {
 
     private String uri;
 
+    private String eventType;
+
     public SocialFileSelectedEvent(){}
 
-    public SocialFileSelectedEvent(String uri){
+    public SocialFileSelectedEvent(String eventType, String uri){
+        this.eventType = eventType;
         this.uri = uri;
     }
 
     public String getUri() {
         return uri;
+    }
+
+    public String getEventType() {
+        return eventType;
     }
 }

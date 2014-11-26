@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.kie.uberfire.social.activities.client.gravatar.GravatarBuilder;
+import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SimpleItemWidgetModel;
 import org.kie.uberfire.social.activities.client.widgets.utils.SocialDateFormatter;
 import org.kie.uberfire.social.activities.model.SocialUser;
@@ -83,7 +84,7 @@ public class SimpleItemWidget extends Composite {
         link.addClickHandler( new ClickHandler() {
             @Override
             public void onClick( ClickEvent event ) {
-                model.getLinkCommand().execute( model.getLinkPath().toURI() );
+                model.getLinkCommand().execute( new LinkCommandParams( model.getEventType(), model.getLinkPath().toURI() ) );
             }
         } );
         list.add( link );
