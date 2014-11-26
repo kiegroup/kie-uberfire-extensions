@@ -3,11 +3,13 @@ package org.kie.uberfire.social.activities.client.widgets.timeline.regular.model
 import java.util.List;
 import java.util.Map;
 
+import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
 import org.kie.uberfire.social.activities.client.widgets.timeline.regular.SocialTimelineWidget;
 import org.kie.uberfire.social.activities.model.SocialEventType;
 import org.kie.uberfire.social.activities.model.SocialUser;
 import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.workbench.type.ClientResourceType;
+import org.uberfire.commons.data.Pair;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.ParameterizedCommand;
 
@@ -25,7 +27,7 @@ public class SocialTimelineWidgetModel {
     private ParameterizedCommand<String> userClickCommand;
 
     private ParameterizedCommand<String> followUnfollowCommand;
-    private ParameterizedCommand<String> linkCommand;
+    private ParameterizedCommand<LinkCommandParams> linkCommand;
 
     public SocialTimelineWidgetModel( SocialUser socialUser,
                                       PlaceManager placeManager, List<ClientResourceType> resourceTypes ) {
@@ -44,7 +46,7 @@ public class SocialTimelineWidgetModel {
         return this;
     }
 
-    public SocialTimelineWidgetModel withLinkCommand( ParameterizedCommand<String> linkCommand ) {
+    public SocialTimelineWidgetModel withLinkCommand( ParameterizedCommand<LinkCommandParams> linkCommand ) {
         this.linkCommand = linkCommand;
         return this;
     }
@@ -104,11 +106,11 @@ public class SocialTimelineWidgetModel {
         return followUnfollowCommand;
     }
 
-    public ParameterizedCommand<String> getLinkCommand() {
+    public ParameterizedCommand<LinkCommandParams> getLinkCommand() {
         if(linkCommand==null){
-            return new ParameterizedCommand<String>() {
+            return new ParameterizedCommand<LinkCommandParams>() {
                 @Override
-                public void execute( String parameter ) {
+                public void execute( LinkCommandParams parameters ) {
 
                 }
             };

@@ -3,6 +3,7 @@ package org.kie.uberfire.social.activities.client.widgets.timeline.simple.model;
 import java.util.List;
 
 import com.github.gwtbootstrap.client.ui.NavLink;
+import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
 import org.kie.uberfire.social.activities.client.widgets.timeline.regular.model.SocialTimelineWidgetModel;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialEventType;
@@ -23,7 +24,7 @@ public class SimpleSocialTimelineWidgetModel {
     private NavLink less;
     private NavLink more;
     private List<ClientResourceType> resourceTypes;
-    private ParameterizedCommand<String> linkCommand;
+    private ParameterizedCommand<LinkCommandParams> linkCommand;
 
     public SimpleSocialTimelineWidgetModel( SocialEventType socialEventType,
                                             SocialPredicate<SocialActivitiesEvent> predicate,
@@ -52,7 +53,7 @@ public class SimpleSocialTimelineWidgetModel {
         return this;
     }
 
-    public SimpleSocialTimelineWidgetModel withLinkCommand( ParameterizedCommand<String> linkCommand ) {
+    public SimpleSocialTimelineWidgetModel withLinkCommand( ParameterizedCommand<LinkCommandParams> linkCommand ) {
         this.linkCommand = linkCommand;
         return this;
     }
@@ -108,11 +109,11 @@ public class SimpleSocialTimelineWidgetModel {
         return resourceTypes;
     }
 
-    public ParameterizedCommand<String> getLinkCommand() {
+    public ParameterizedCommand<LinkCommandParams> getLinkCommand() {
         if(linkCommand==null){
-            return new ParameterizedCommand<String>() {
+            return new ParameterizedCommand<LinkCommandParams>() {
                 @Override
-                public void execute( String parameter ) {
+                public void execute( LinkCommandParams parameters ) {
 
                 }
             };
