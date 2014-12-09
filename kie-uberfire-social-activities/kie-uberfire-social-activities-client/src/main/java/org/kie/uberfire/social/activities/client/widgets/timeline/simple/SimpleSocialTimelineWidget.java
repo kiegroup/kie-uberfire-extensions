@@ -2,8 +2,6 @@ package org.kie.uberfire.social.activities.client.widgets.timeline.simple;
 
 import com.github.gwtbootstrap.client.ui.Container;
 import com.github.gwtbootstrap.client.ui.Fieldset;
-import com.github.gwtbootstrap.client.ui.FluidContainer;
-import com.github.gwtbootstrap.client.ui.FluidRow;
 import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.core.client.GWT;
@@ -12,7 +10,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
@@ -25,7 +22,6 @@ import org.kie.uberfire.social.activities.service.SocialTypeTimelinePagedReposit
 import org.kie.uberfire.social.activities.service.SocialUserTimelinePagedRepositoryAPI;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.VFSService;
-import org.uberfire.mvp.ParameterizedCommand;
 
 public class SimpleSocialTimelineWidget extends Composite {
 
@@ -95,7 +91,7 @@ public class SimpleSocialTimelineWidget extends Composite {
         model.updateSocialPaged( paged.socialPaged() );
         for ( final SocialActivitiesEvent event : paged.socialEvents() ) {
             if ( event.hasLink() ) {
-                createSimpleWidgetWithFileLink( event );
+                createSimpleWidgetWithLink( event );
             } else {
                 createSimpleWidget( event );
             }
@@ -103,23 +99,44 @@ public class SimpleSocialTimelineWidget extends Composite {
         setupPaginationButtonsSocial();
     }
 
-    private void createSimpleWidgetWithFileLink( final SocialActivitiesEvent event ) {
-        MessageBuilder.createCall( new RemoteCallback<Path>() {
-            public void callback( Path path ) {
-                SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(), event.getTimestamp(), event.getLinkLabel(), path, event.getAdicionalInfos() )
-                            .withLinkCommand( model.getLinkCommand() );
-                SimpleItemWidget item = GWT.create( SimpleItemWidget.class );
-                item.init( rowModel );
-                itemsPanel.add( item );
-            }
-        }, VFSService.class ).get( event.getLinkTarget() );
+    private void createSimpleWidgetWithLink( final SocialActivitiesEvent event ) {
+
+        final SimpleItemWidgetModel itemModel = new SimpleItemWidgetModel( model, event.getType(),
+                event.getTimestamp(),
+                event.getLinkLabel(),
+                event.getLinkTarget(),
+                event.getLinkType(),
+                event.getAdicionalInfos() )
+                .withLinkCommand( model.getLinkCommand() )
+                .withLinkParams( event.getLinkParams() );
+
+        if ( event.isVFSLink() ) {
+            MessageBuilder.createCall( new RemoteCallback<Path>() {
+                public void callback( Path path ) {
+                    itemModel.withLinkPath( path );
+                    addItemWidget( itemModel );
+
+                }
+            }, VFSService.class ).get( event.getLinkTarget() );
+        } else {
+            addItemWidget( itemModel );
+        }
+    }
+
+    private void addItemWidget( SimpleItemWidgetModel model ) {
+        SimpleItemWidget item = GWT.create( SimpleItemWidget.class );
+        item.init( model );
+        itemsPanel.add( item );
     }
 
     private void createSimpleWidget( SocialActivitiesEvent event ) {
-        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(), event.getTimestamp(), event.getDescription(), event.getAdicionalInfos() );
-        SimpleItemWidget item = GWT.create( SimpleItemWidget.class );
-        item.init( rowModel );
-        itemsPanel.add( item );
+        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model,
+                event.getType(),
+                event.getTimestamp(),
+                event.getDescription(),
+                event.getAdicionalInfos() )
+                .withLinkParams( event.getLinkParams() );
+        addItemWidget( rowModel );
     }
 
     private void setupPaginationButtonsSocial() {

@@ -13,14 +13,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.kie.uberfire.social.activities.client.gravatar.GravatarBuilder;
 import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SimpleItemWidgetModel;
 import org.kie.uberfire.social.activities.client.widgets.utils.SocialDateFormatter;
 import org.kie.uberfire.social.activities.model.SocialUser;
-import org.uberfire.client.mvp.PlaceManager;
+import org.uberfire.client.resources.UberfireResources;
 import org.uberfire.client.workbench.type.ClientResourceType;
 
 public class SimpleItemWidget extends Composite {
@@ -35,6 +34,9 @@ public class SimpleItemWidget extends Composite {
     Column desc;
 
     private static MyUiBinder uiBinder = GWT.create( MyUiBinder.class );
+
+    private static final com.google.gwt.user.client.ui.Image GENERIC_FILE_IMAGE = new com.google.gwt.user.client.ui.Image( UberfireResources.INSTANCE.images().typeGenericFile() );
+
 
     interface MyUiBinder extends UiBinder<Widget, SimpleItemWidget> {
 
@@ -67,13 +69,19 @@ public class SimpleItemWidget extends Composite {
     }
 
     private void createIcon( final SimpleItemWidgetModel model ) {
-        for ( ClientResourceType type : model.getResourceTypes() ) {
-            if ( type.accept( model.getLinkPath() ) ) {
-                com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = (com.google.gwt.user.client.ui.Image) type.getIcon();
-                Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
-                icon.add( newImage );
-                break;
+        if ( model.isVFSLink() ) {
+            for ( ClientResourceType type : model.getResourceTypes() ) {
+                if ( type.accept( model.getLinkPath() ) ) {
+                    com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = (com.google.gwt.user.client.ui.Image) type.getIcon();
+                    Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
+                    icon.add( newImage );
+                    break;
+                }
             }
+        } else {
+            com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = GENERIC_FILE_IMAGE;
+            Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
+            icon.add( newImage );
         }
     }
 
@@ -84,7 +92,10 @@ public class SimpleItemWidget extends Composite {
         link.addClickHandler( new ClickHandler() {
             @Override
             public void onClick( ClickEvent event ) {
-                model.getLinkCommand().execute( new LinkCommandParams( model.getEventType(), model.getLinkPath().toURI() ) );
+                model.getLinkCommand().execute( new LinkCommandParams( model.getEventType(),
+                        model.getLinkURI(),
+                        model.getLinkType() )
+                        .withLinkParams( model.getLinkParams() ) );
             }
         } );
         list.add( link );
