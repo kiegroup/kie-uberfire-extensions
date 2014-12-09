@@ -11,7 +11,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
-import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.uberfire.social.activities.client.widgets.item.SimpleItemWidget;
 import org.kie.uberfire.social.activities.client.widgets.item.SocialItemExpandedWidget;
@@ -23,7 +22,6 @@ import org.kie.uberfire.social.activities.client.widgets.timeline.regular.model.
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.service.SocialTimeLineRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelineRulesQueryAPI;
-import org.kie.uberfire.social.activities.service.SocialUserRepositoryAPI;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.VFSService;
 
@@ -62,22 +60,52 @@ public class SocialTimelineWidget extends Composite {
                                      final SocialTimelineWidgetModel model ) {
         for ( final SocialActivitiesEvent event : events ) {
             if ( event.hasLink() ) {
-                MessageBuilder.createCall( new RemoteCallback<Path>() {
-                    public void callback( Path path ) {
-                        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(), event.getTimestamp(), event.getLinkLabel(), path, event.getAdicionalInfos() )
-                                .withLinkCommand( model.getLinkCommand() );
-                        SimpleItemWidget simple = GWT.create( SimpleItemWidget.class );
-                        simple.init( rowModel );
-                        itemsPanel.add( simple );
-                    }
-                }, VFSService.class ).get( event.getLinkTarget() );
+                createSimpleWidgetWithLink( event );                 ;
             } else {
-                SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(), event.getTimestamp(), event.getDescription(), event.getAdicionalInfos() );
-                SimpleItemWidget simple = GWT.create( SimpleItemWidget.class );
-                simple.init( rowModel );
-                itemsPanel.add( simple );
+                createSimpleWidget( event );
             }
         }
+    }
+
+    private void createSimpleWidgetWithLink( final SocialActivitiesEvent event ) {
+
+        final SimpleItemWidgetModel itemModel = new SimpleItemWidgetModel( model, event.getType(),
+                event.getTimestamp(),
+                event.getLinkLabel(),
+                event.getLinkTarget(),
+                event.getLinkType(),
+                event.getDescription(),
+                event.getAdicionalInfos() )
+                .withLinkCommand( model.getLinkCommand() )
+                .withLinkParams( event.getLinkParams() );
+
+        if ( event.isVFSLink() ) {
+            MessageBuilder.createCall( new RemoteCallback<Path>() {
+                public void callback( Path path ) {
+                    itemModel.withLinkPath( path );
+                    addItemWidget( itemModel );
+
+                }
+            }, VFSService.class ).get( event.getLinkTarget() );
+        } else {
+            addItemWidget( itemModel );
+        }
+    }
+
+    private void createSimpleWidget( SocialActivitiesEvent event ) {
+        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(),
+                event.getTimestamp(),
+                event.getDescription(),
+                event.getAdicionalInfos() )
+                .withLinkParams( event.getLinkParams() );
+
+        addItemWidget( rowModel );
+    }
+
+    private void addItemWidget( SimpleItemWidgetModel model ) {
+        SimpleItemWidget simple = GWT.create( SimpleItemWidget.class );
+        simple.init( model );
+        itemsPanel.add( simple );
     }
 
     private void createDroolsQuerySocialItemsWidget( final SocialTimelineWidgetModel model ) {

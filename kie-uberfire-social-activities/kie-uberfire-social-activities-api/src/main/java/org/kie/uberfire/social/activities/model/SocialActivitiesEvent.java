@@ -2,11 +2,15 @@ package org.kie.uberfire.social.activities.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 @Portable
 public class SocialActivitiesEvent implements Serializable {
+
+    public static enum LINK_TYPE { VFS, CUSTOM }
 
     private static final long serialVersionUID = 1L;
     private static SocialActivitiesEvent dummyLastWrittenMarker;
@@ -15,6 +19,8 @@ public class SocialActivitiesEvent implements Serializable {
     private String type;
     private String linkLabel;
     private String linkTarget;
+    private Map<String, String> linkParams = new HashMap<String, String>( );
+    private LINK_TYPE linkType = LINK_TYPE.VFS;
     private String[] additionalInfo;
     private String description;
 
@@ -44,8 +50,21 @@ public class SocialActivitiesEvent implements Serializable {
         return this;
     }
 
+    public SocialActivitiesEvent withLink( String linklabel,
+            String linkTarget, LINK_TYPE linkType ) {
+        this.linkLabel = linklabel;
+        this.linkTarget = linkTarget;
+        this.linkType = linkType;
+        return this;
+    }
+
     public SocialActivitiesEvent withDescription( String description) {
         this.description = description;
+        return this;
+    }
+
+    public SocialActivitiesEvent withParam( String name, String value) {
+        linkParams.put( name, value );
         return this;
     }
 
@@ -63,6 +82,14 @@ public class SocialActivitiesEvent implements Serializable {
 
     public String getLinkTarget() {
         return linkTarget;
+    }
+
+    public LINK_TYPE getLinkType() {
+        return linkType;
+    }
+
+    public boolean isVFSLink() {
+        return linkType == LINK_TYPE.VFS;
     }
 
     public SocialActivitiesEvent withAdicionalInfo( String... adicionalInfo ) {
@@ -92,6 +119,10 @@ public class SocialActivitiesEvent implements Serializable {
 
     public SocialUser getSocialUser() {
         return socialUser;
+    }
+
+    public Map<String, String> getLinkParams() {
+        return linkParams;
     }
 
     @Override

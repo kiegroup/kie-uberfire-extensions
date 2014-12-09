@@ -21,11 +21,14 @@ import org.kie.uberfire.social.activities.model.SocialUser;
 import org.kie.uberfire.social.activities.service.SocialUserRepositoryAPI;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.VFSService;
+import org.uberfire.client.resources.UberfireResources;
 import org.uberfire.client.workbench.type.ClientResourceType;
 
 public class SocialItemExpandedWidget extends Composite {
 
     private static MyUiBinder uiBinder = GWT.create( MyUiBinder.class );
+
+    private static final com.google.gwt.user.client.ui.Image GENERIC_FILE_IMAGE = new com.google.gwt.user.client.ui.Image( UberfireResources.INSTANCE.images().typeGenericFile() );
 
     @UiField
     Column icon;
@@ -62,18 +65,27 @@ public class SocialItemExpandedWidget extends Composite {
 
     private void createIcon( final SocialItemExpandedWidgetModel model ) {
 
-        MessageBuilder.createCall( new RemoteCallback<Path>() {
-            public void callback( Path path ) {
-                for ( ClientResourceType type : model.getModel().getResourceTypes() ) {
-                    if ( type.accept( path ) ) {
-                        com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = (com.google.gwt.user.client.ui.Image) type.getIcon();
-                        Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
-                        icon.add( newImage );
-                        break;
+        UpdateItem updateItem = model.getUpdateItems().get( 0 );
+        if ( updateItem.getEvent().isVFSLink() ) {
+            MessageBuilder.createCall( new RemoteCallback<Path>() {
+                public void callback( Path path ) {
+                    for ( ClientResourceType type : model.getModel().getResourceTypes() ) {
+                        if ( type.accept( path ) ) {
+                            com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = (com.google.gwt.user.client.ui.Image) type.getIcon();
+                            Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
+                            icon.add( newImage );
+                            break;
+                        }
                     }
                 }
-            }
-        }, VFSService.class ).get( model.getUpdateItems().get( 0 ).getEvent().getLinkTarget() );
+            }, VFSService.class ).get( updateItem.getEvent().getLinkTarget() );
+
+        } else {
+            //TODO, provide icons per event type.
+            com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = GENERIC_FILE_IMAGE;
+            Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
+            icon.add( newImage );
+        }
     }
 
     private void createLink( final SocialItemExpandedWidgetModel model ) {
@@ -85,7 +97,10 @@ public class SocialItemExpandedWidget extends Composite {
         link.addClickHandler( new ClickHandler() {
             @Override
             public void onClick( ClickEvent event ) {
-                model.getModel().getLinkCommand().execute( new LinkCommandParams( updateItem.getEvent().getType(), updateItem.getEvent().getLinkTarget() ) );
+                model.getModel().getLinkCommand().execute( new LinkCommandParams( updateItem.getEvent().getType(),
+                        updateItem.getEvent().getLinkTarget(),
+                        updateItem.getEvent().getLinkType() )
+                        .withLinkParams( updateItem.getEvent().getLinkParams() ) );
             }
         } );
         list.add( link );
