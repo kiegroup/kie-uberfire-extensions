@@ -10,7 +10,10 @@ when
   $result:SocialActivitiesEvent(getLinkTarget() contains filter) from queryAPI.getTypeCached("RESOURCE_ADDED_EVENT",
                                                                                              "RESOURCE_UPDATE_EVENT",
                                                                                              "NEW_REPOSITORY_EVENT",
-                                                                                             "NEW_ORGANIZATIONAL_UNIT")
+                                                                                             "NEW_ORGANIZATIONAL_UNIT",
+                                                                                             "ORGANIZATIONAL_UNIT_UPDATED",
+                                                                                             "REPO_ADDED_TO_ORGANIZATIONAL_UNIT",
+                                                                                             "REPO_REMOVED_FROM_ORGANIZATIONAL_UNIT")
   eval( true )
 then
   socialEvents.add($result);
