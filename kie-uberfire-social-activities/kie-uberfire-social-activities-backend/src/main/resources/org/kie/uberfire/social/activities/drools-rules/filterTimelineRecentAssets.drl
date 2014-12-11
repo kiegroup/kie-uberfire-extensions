@@ -13,7 +13,8 @@ when
                                                                                              "NEW_ORGANIZATIONAL_UNIT",
                                                                                              "ORGANIZATIONAL_UNIT_UPDATED",
                                                                                              "REPO_ADDED_TO_ORGANIZATIONAL_UNIT",
-                                                                                             "REPO_REMOVED_FROM_ORGANIZATIONAL_UNIT")
+                                                                                             "REPO_REMOVED_FROM_ORGANIZATIONAL_UNIT",
+                                                                                             "NEW_PROJECT")
   eval( true )
 then
   socialEvents.add($result);
