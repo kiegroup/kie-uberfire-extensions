@@ -33,24 +33,31 @@ public class SocialActivitiesEventObserver {
     @Inject
     private SocialActivitiesAPI socialAPI;
 
+    @Inject
+    private SocialConfiguration socialConfiguration;
+
     @PostConstruct
     public void setup() {
         socialAdapters = socialAdapterRepository.getSocialAdapters();
     }
 
     public void handleSocialActivitiesEvent( @Observes SocialActivitiesEvent event ) {
-        socialAPI.register( event );
+        if ( socialConfiguration.isSocialEnable() ) {
+            socialAPI.register( event );
+        }
     }
 
     public void observeAllEvents( @Observes(notifyObserver = Reception.IF_EXISTS) Object event ) {
-        if (socialAdapters == null) {
-            return;
-        }
-        for ( Map.Entry<Class, SocialAdapter> entry : socialAdapters.entrySet() ) {
-            SocialAdapter adapter = entry.getValue();
-            if ( adapter.shouldInterceptThisEvent( event ) ) {
-                SocialActivitiesEvent socialEvent = adapter.toSocial( event );
-                socialActivitiesEvent.fire( socialEvent );
+        if ( socialConfiguration.isSocialEnable() ) {
+            if ( socialAdapters == null ) {
+                return;
+            }
+            for ( Map.Entry<Class, SocialAdapter> entry : socialAdapters.entrySet() ) {
+                SocialAdapter adapter = entry.getValue();
+                if ( adapter.shouldInterceptThisEvent( event ) ) {
+                    SocialActivitiesEvent socialEvent = adapter.toSocial( event );
+                    socialActivitiesEvent.fire( socialEvent );
+                }
             }
         }
     }
