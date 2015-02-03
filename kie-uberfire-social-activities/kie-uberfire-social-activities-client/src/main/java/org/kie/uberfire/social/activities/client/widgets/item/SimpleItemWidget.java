@@ -65,6 +65,7 @@ public class SimpleItemWidget extends Composite {
         StringBuilder sb = new StringBuilder();
         sb.append( model.getItemDescription() );
         sb.append( SocialDateFormatter.format( model.getTimestamp() ) );
+        sb.append( " by " + model.getSocialUser().getUserName() );
         return new Paragraph( sb.toString() );
     }
 

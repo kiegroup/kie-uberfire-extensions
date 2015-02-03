@@ -69,13 +69,14 @@ public class SocialTimelineWidget extends Composite {
 
     private void createSimpleWidgetWithLink( final SocialActivitiesEvent event ) {
 
-        final SimpleItemWidgetModel itemModel = new SimpleItemWidgetModel( model, event.getType(),
+        final SimpleItemWidgetModel itemModel = new SimpleItemWidgetModel(model, event.getType(),
                 event.getTimestamp(),
                 event.getLinkLabel(),
                 event.getLinkTarget(),
                 event.getLinkType(),
                 event.getDescription(),
-                event.getAdicionalInfos() )
+                event.getAdicionalInfos(),
+                model.getSocialUser())
                 .withLinkCommand( model.getLinkCommand() )
                 .withLinkParams( event.getLinkParams() );
 

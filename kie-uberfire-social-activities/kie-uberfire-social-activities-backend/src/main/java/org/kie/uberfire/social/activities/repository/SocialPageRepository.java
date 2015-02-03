@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import org.kie.uberfire.social.activities.adapters.CommandTimelineFilter;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialPaged;
+import org.kie.uberfire.social.activities.service.SocialPredicate;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 
 public abstract class SocialPageRepository {
@@ -121,4 +122,17 @@ public abstract class SocialPageRepository {
         return socialPaged;
     }
 
+    List<SocialActivitiesEvent> filterList( SocialPredicate<SocialActivitiesEvent> predicate,
+                                                    List<SocialActivitiesEvent> freshEvents ) {
+        if ( predicate == null ) {
+            return freshEvents;
+        }
+        List<SocialActivitiesEvent> filteredList = new ArrayList<SocialActivitiesEvent>();
+        for ( SocialActivitiesEvent socialActivitiesEvent : freshEvents ) {
+            if ( predicate.test( socialActivitiesEvent ) ) {
+                filteredList.add( socialActivitiesEvent );
+            }
+        }
+        return filteredList;
+    }
 }

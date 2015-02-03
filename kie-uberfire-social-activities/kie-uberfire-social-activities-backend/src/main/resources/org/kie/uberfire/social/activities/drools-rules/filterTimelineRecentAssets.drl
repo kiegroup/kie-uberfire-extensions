@@ -9,6 +9,7 @@ rule "filterTimelineRecentAssets"
 when
   $result:SocialActivitiesEvent(getLinkTarget() contains filter) from queryAPI.getTypeCached("RESOURCE_ADDED_EVENT",
                                                                                              "RESOURCE_UPDATE_EVENT",
+                                                                                             "RESOURCE_UPDATE_EVENT",
                                                                                              "NEW_REPOSITORY_EVENT",
                                                                                              "NEW_ORGANIZATIONAL_UNIT",
                                                                                              "ORGANIZATIONAL_UNIT_UPDATED",

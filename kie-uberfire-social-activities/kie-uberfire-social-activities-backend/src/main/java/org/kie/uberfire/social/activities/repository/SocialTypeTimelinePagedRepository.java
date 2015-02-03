@@ -14,6 +14,7 @@ import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialEventType;
 import org.kie.uberfire.social.activities.model.SocialPaged;
 import org.kie.uberfire.social.activities.service.SocialAdapter;
+import org.kie.uberfire.social.activities.service.SocialPredicate;
 import org.kie.uberfire.social.activities.service.SocialRouterAPI;
 import org.kie.uberfire.social.activities.service.SocialTypeTimelinePagedRepositoryAPI;
 
@@ -27,7 +28,22 @@ public class SocialTypeTimelinePagedRepository extends SocialPageRepository impl
     @Override
     public PagedSocialQuery getEventTimeline( String adapterName,
                                               SocialPaged socialPage ) {
-        return getEventTimeline( adapterName, socialPage, new HashMap() );
+        return getEventTimeline( adapterName, socialPage, new HashMap(), null );
+    }
+
+    @Override
+    public PagedSocialQuery getEventTimeline( SocialAdapter adapter,
+                                              SocialPaged socialPaged ) {
+        return getEventTimeline( adapter, socialPaged, new HashMap(), null );
+    }
+
+
+
+    @Override
+    public PagedSocialQuery getEventTimeline( String adapterName,
+                                              SocialPaged socialPage,
+                                              SocialPredicate<SocialActivitiesEvent> predicate ) {
+        return getEventTimeline( adapterName, socialPage, new HashMap(), predicate );
     }
 
     @Override
@@ -36,33 +52,34 @@ public class SocialTypeTimelinePagedRepository extends SocialPageRepository impl
                                               Map commandsMap ) {
         SocialAdapter socialAdapter = getSocialAdapter( adapterName );
 
-        return getEventTimeline( socialAdapter, socialPaged, commandsMap );
-    }
-
-    SocialAdapter getSocialAdapter( String adapterName ) {
-        return socialRouterAPI.getSocialAdapter( adapterName );
+        return getEventTimeline( socialAdapter, socialPaged, commandsMap, null );
     }
 
     @Override
-    public PagedSocialQuery getEventTimeline( SocialAdapter adapter,
-                                              SocialPaged socialPaged ) {
-        return getEventTimeline( adapter, socialPaged, new HashMap() );
+    public PagedSocialQuery getEventTimeline( String adapterName,
+                                              SocialPaged socialPaged,
+                                              Map commandsMap,
+                                              SocialPredicate<SocialActivitiesEvent> predicate ) {
+        SocialAdapter socialAdapter = getSocialAdapter( adapterName );
+
+        return getEventTimeline( socialAdapter, socialPaged, commandsMap, predicate );
     }
 
     @Override
     public PagedSocialQuery getEventTimeline( SocialAdapter adapter,
                                               SocialPaged socialPaged,
-                                              Map commandsMap ) {
+                                              Map commandsMap,
+                                              SocialPredicate<SocialActivitiesEvent> predicate ) {
 
         socialPaged = setupQueryDirection( socialPaged );
 
         List<SocialActivitiesEvent> typeEvents = new ArrayList<SocialActivitiesEvent>();
 
         if ( socialPaged.isANewQuery() ) {
-            socialPaged = searchForRecentEvents( adapter.socialEventType(), socialPaged, typeEvents );
+            socialPaged = searchForRecentEvents( adapter.socialEventType(), socialPaged, typeEvents, predicate );
         }
         if ( !foundEnoughtEvents( socialPaged, typeEvents ) ) {
-            socialPaged = searchForStoredEvents( adapter.socialEventType(), socialPaged, typeEvents );
+            socialPaged = searchForStoredEvents( adapter.socialEventType(), socialPaged, typeEvents, predicate );
         }
 
         typeEvents = filterTimelineWithAdapters( commandsMap, typeEvents );
@@ -74,16 +91,26 @@ public class SocialTypeTimelinePagedRepository extends SocialPageRepository impl
         return query;
     }
 
+
+    SocialAdapter getSocialAdapter( String adapterName ) {
+        return socialRouterAPI.getSocialAdapter( adapterName );
+    }
+
+
+
+
+
     private SocialPaged searchForStoredEvents( SocialEventType type,
                                                SocialPaged socialPaged,
-                                               List<SocialActivitiesEvent> events ) {
+                                               List<SocialActivitiesEvent> events,
+                                               SocialPredicate<SocialActivitiesEvent> predicate ) {
         if ( socialPaged.firstFileRead() ) {
-            readMostRecentFile( type, socialPaged, events );
+            readMostRecentFile( type, socialPaged, events, predicate );
         } else {
-            readCurrentFile( type, socialPaged, events );
+            readCurrentFile( type, socialPaged, events, predicate );
         }
         if ( !foundEnoughtEvents( socialPaged, events ) && shouldIReadMoreFiles( socialPaged ) ) {
-            readMoreFiles( socialPaged, type, events );
+            readMoreFiles( socialPaged, type, events, predicate );
         }
         return socialPaged;
     }
@@ -94,12 +121,13 @@ public class SocialTypeTimelinePagedRepository extends SocialPageRepository impl
 
     private void readMoreFiles( SocialPaged socialPaged,
                                 SocialEventType type,
-                                List<SocialActivitiesEvent> events ) {
+                                List<SocialActivitiesEvent> events,
+                                SocialPredicate<SocialActivitiesEvent> predicate ) {
         String nextFileToRead = socialPaged.getNextFileToRead();
         if ( thereIsMoreFilesToRead( nextFileToRead ) ) {
-            addEventsToTimeline( type, socialPaged, events, nextFileToRead );
+            addEventsToTimeline( type, socialPaged, events, nextFileToRead, predicate );
             if ( !foundEnoughtEvents( socialPaged, events ) ) {
-                readMoreFiles( socialPaged, type, events );
+                readMoreFiles( socialPaged, type, events, predicate );
             }
         }
         checkIfICanGoForward( socialPaged, events );
@@ -107,18 +135,21 @@ public class SocialTypeTimelinePagedRepository extends SocialPageRepository impl
 
     private void readCurrentFile( SocialEventType type,
                                   SocialPaged socialPaged,
-                                  List<SocialActivitiesEvent> events ) {
+                                  List<SocialActivitiesEvent> events,
+                                  SocialPredicate<SocialActivitiesEvent> predicate ) {
         String lastFileReaded = socialPaged.lastFileReaded();
-        addEventsToTimeline( type, socialPaged, events, lastFileReaded );
+        addEventsToTimeline( type, socialPaged, events, lastFileReaded, predicate );
     }
 
     private void addEventsToTimeline( SocialEventType type,
                                       SocialPaged socialPaged,
                                       List<SocialActivitiesEvent> events,
-                                      String lastFileReaded ) {
+                                      String lastFileReaded,
+                                      SocialPredicate<SocialActivitiesEvent> predicate ) {
         List<SocialActivitiesEvent> timeline = getSocialTimelinePersistenceAPI().getTimeline( type, lastFileReaded );
+        List<SocialActivitiesEvent> filteredList = filterList( predicate, timeline );
         setNumberOfEventsOnFile( socialPaged, type, lastFileReaded );
-        addEvents( socialPaged, events, timeline );
+        addEvents( socialPaged, events, filteredList );
     }
 
     private void setNumberOfEventsOnFile( SocialPaged socialPaged,
@@ -129,19 +160,23 @@ public class SocialTypeTimelinePagedRepository extends SocialPageRepository impl
 
     private void readMostRecentFile( SocialEventType type,
                                      SocialPaged socialPaged,
-                                     List<SocialActivitiesEvent> events ) {
+                                     List<SocialActivitiesEvent> events,
+                                     SocialPredicate<SocialActivitiesEvent> predicate ) {
         Integer userMostRecentFileIndex = getSocialTimelinePersistenceAPI().getTypeMostRecentFileIndex( type );
         List<SocialActivitiesEvent> timeline = getSocialTimelinePersistenceAPI().getTimeline( type, userMostRecentFileIndex.toString() );
+        List<SocialActivitiesEvent> filteredList = filterList( predicate, timeline );
         socialPaged.setLastFileReaded( userMostRecentFileIndex.toString() );
-        readEvents( socialPaged, events, timeline );
+        readEvents( socialPaged, events, filteredList );
     }
 
     private SocialPaged searchForRecentEvents( SocialEventType type,
                                                SocialPaged socialPaged,
-                                               List<SocialActivitiesEvent> events ) {
+                                               List<SocialActivitiesEvent> events,
+                                               SocialPredicate<SocialActivitiesEvent> predicate ) {
         List<SocialActivitiesEvent> freshEvents = getSocialTimelinePersistenceAPI().getRecentEvents( type );
-        Collections.reverse( freshEvents );
-        searchEvents( socialPaged, events, freshEvents );
+        List<SocialActivitiesEvent> filteredList = filterList( predicate, freshEvents );
+        Collections.reverse( filteredList );
+        searchEvents( socialPaged, events, filteredList );
         return socialPaged;
     }
 

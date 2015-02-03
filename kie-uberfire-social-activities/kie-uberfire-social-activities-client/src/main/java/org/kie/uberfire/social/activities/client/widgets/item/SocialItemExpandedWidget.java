@@ -2,6 +2,7 @@ package org.kie.uberfire.social.activities.client.widgets.item;
 
 import com.github.gwtbootstrap.client.ui.Column;
 import com.github.gwtbootstrap.client.ui.Container;
+import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.Image;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
@@ -37,7 +38,7 @@ public class SocialItemExpandedWidget extends Composite {
     Column file;
 
     @UiField
-    Container table;
+    FluidContainer table;
 
     interface MyUiBinder extends UiBinder<Widget, SocialItemExpandedWidget> {
 
