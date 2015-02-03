@@ -121,7 +121,12 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     private void updateLastIndexFile( Path directory,
                                       String lastIndex ) {
         Path lastFileIndex = directory.resolve( Constants.LAST_FILE_INDEX.name() );
-        getIoService().write( lastFileIndex, lastIndex );
+        try {
+            getIoService().startBatch( directory.getFileSystem() );
+            getIoService().write( lastFileIndex, lastIndex );
+        } finally {
+            getIoService().endBatch();
+        }
     }
 
     private String persistEvents( List<SocialActivitiesEvent> newEvents,
@@ -140,7 +145,13 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
                                      int size ) {
         String metadataFileName = originalFilename + Constants.METADATA;
         Path timelineFile = timeLineDir.resolve( metadataFileName );
-        ioService.write( timelineFile, size + "" );
+        try {
+            getIoService().startBatch( timeLineDir.getFileSystem() );
+            getIoService().write( timelineFile, size + "" );
+        }
+        finally {
+            getIoService().endBatch();
+        }
     }
 
     private String getItemsMetadata( Path timeLineDir,
@@ -151,7 +162,6 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
             String itemsMetadata = ioService.readAllString( timelineFile );
             return itemsMetadata;
         }
-        //return json
         return "-1";
     }
 
@@ -160,9 +170,13 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         SocialFile socialFile = new SocialFile( timeLineFile, ioService, gson );
 
         try {
+            ioService.startBatch( timeLineFile.getFileSystem() );
             socialFile.write( newEvents );
         } catch ( IOException e ) {
             throw new ErrorAccessingTimeline( e );
+        }
+        finally {
+            ioService.endBatch();
         }
 
     }
@@ -205,9 +219,8 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     }
 
     private class ErrorAccessingTimeline extends RuntimeException {
-
         public ErrorAccessingTimeline( Exception e ) {
-            e.printStackTrace();
+            super( e );
         }
     }
 

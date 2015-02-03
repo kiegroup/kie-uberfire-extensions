@@ -38,9 +38,10 @@ public class SimpleItemWidgetModel {
                                   String linkText,
                                   String linkURI,
                                   LINK_TYPE linkType,
-                                  String itemDescription ) {
+                                  String itemDescription,
+                                  SocialUser socialUser) {
 
-        this.socialUser = model.getSocialUser();
+        this.socialUser = socialUser;
         this.resourceTypes = model.getResourceTypes();
         this.placeManager = model.getPlaceManager();
         this.eventType = eventType;
@@ -56,12 +57,12 @@ public class SimpleItemWidgetModel {
         return resourceTypes != null && getLinkText() != null;
     }
 
-    public SimpleItemWidgetModel( SimpleSocialTimelineWidgetModel model,
-                                  String eventType,
+    public SimpleItemWidgetModel( String eventType,
                                   Date timestamp,
                                   String description,
-                                  String itemDescription ) {
-        this.socialUser = model.getSocialUser();
+                                  String itemDescription,
+                                  SocialUser socialUser) {
+        this.socialUser = socialUser;
         this.eventType = eventType;
         this.timestamp = timestamp;
         this.description = description;
@@ -76,8 +77,9 @@ public class SimpleItemWidgetModel {
                                   String linkURI,
                                   LINK_TYPE linkType,
                                   String description,
-                                  String itemDescription ) {
-        this.socialUser = model.getSocialUser();
+                                  String itemDescription,
+                                  SocialUser socialUser) {
+        this.socialUser = socialUser;
         this.placeManager = model.getPlaceManager();
         this.eventType = eventType;
         this.timestamp = timestamp;

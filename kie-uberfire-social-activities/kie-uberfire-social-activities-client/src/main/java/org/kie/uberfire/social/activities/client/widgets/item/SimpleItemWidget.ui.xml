@@ -12,12 +12,9 @@
       text-align: left
     }
   </ui:style>
-  <b:Row>
-    <b:Column size="1" ui:field="icon" addStyleNames="{style.right}">
-    </b:Column>
-    <b:Column size="2" ui:field="link" addStyleNames="{style.left}">
-    </b:Column>
-    <b:Column size="9" ui:field="desc" addStyleNames="{style.left}">
-    </b:Column>
-  </b:Row>
+  <b:FluidRow>
+    <b:Column size="2" ui:field="icon" addStyleNames="{style.right}"/>
+    <b:Column size="4" ui:field="link" addStyleNames="{style.left}"/>
+    <b:Column size="6" ui:field="desc" addStyleNames="{style.left}"/>
+  </b:FluidRow>
 </ui:UiBinder>

@@ -21,12 +21,12 @@
     }
   </ui:style>
 
-  <b:Container ui:field="table">
-    <b:Row>
+  <b:FluidContainer ui:field="table">
+    <b:FluidRow>
       <b:Column size="1" ui:field="icon" addStyleNames="{style.right}">
       </b:Column>
       <b:Column size="11" ui:field="file" addStyleNames="{style.left}">
       </b:Column>
-    </b:Row>
-  </b:Container>
+    </b:FluidRow>
+  </b:FluidContainer>
 </ui:UiBinder>

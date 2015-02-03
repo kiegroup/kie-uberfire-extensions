@@ -2,6 +2,7 @@ package org.kie.uberfire.social.activities.client.widgets.timeline.simple;
 
 import com.github.gwtbootstrap.client.ui.Container;
 import com.github.gwtbootstrap.client.ui.Fieldset;
+import com.github.gwtbootstrap.client.ui.FluidContainer;
 import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.core.client.GWT;
@@ -28,7 +29,7 @@ public class SimpleSocialTimelineWidget extends Composite {
     private SimpleSocialTimelineWidgetModel model;
 
     @UiField
-    Container itemsPanel;
+    FluidContainer itemsPanel;
 
     @UiField
     Fieldset pagination;
@@ -44,6 +45,7 @@ public class SimpleSocialTimelineWidget extends Composite {
         itemsPanel.clear();
         createWidgets();
     }
+
     private void createWidgets() {
         pagination.clear();
         if ( model.isSocialTypeWidget() ) {
@@ -53,13 +55,12 @@ public class SimpleSocialTimelineWidget extends Composite {
         }
     }
 
-
     private void createUserTimelineItemsWidget() {
         MessageBuilder.createCall( new RemoteCallback<PagedSocialQuery>() {
             public void callback( PagedSocialQuery paged ) {
                 createTimeline( paged );
             }
-        }, SocialUserTimelinePagedRepositoryAPI.class ).getUserTimeline( model.getSocialUser(), model.getSocialPaged() );
+        }, SocialUserTimelinePagedRepositoryAPI.class ).getUserTimeline( model.getSocialUser(), model.getSocialPaged(),  model.getPredicate() );
     }
 
     private void createSociaTypelItemsWidget() {
@@ -67,7 +68,7 @@ public class SimpleSocialTimelineWidget extends Composite {
             public void callback( PagedSocialQuery paged ) {
                 createTimeline( paged );
             }
-        }, SocialTypeTimelinePagedRepositoryAPI.class ).getEventTimeline( model.getSocialEventType().name(), model.getSocialPaged() );
+        }, SocialTypeTimelinePagedRepositoryAPI.class ).getEventTimeline( model.getSocialEventType().name(), model.getSocialPaged(),  model.getPredicate() );
     }
 
     private void createTimeline( PagedSocialQuery paged ) {
@@ -102,11 +103,12 @@ public class SimpleSocialTimelineWidget extends Composite {
     private void createSimpleWidgetWithLink( final SocialActivitiesEvent event ) {
 
         final SimpleItemWidgetModel itemModel = new SimpleItemWidgetModel( model, event.getType(),
-                event.getTimestamp(),
-                event.getLinkLabel(),
-                event.getLinkTarget(),
-                event.getLinkType(),
-                event.getAdicionalInfos() )
+                                                                           event.getTimestamp(),
+                                                                           event.getLinkLabel(),
+                                                                           event.getLinkTarget(),
+                                                                           event.getLinkType(),
+                                                                           event.getAdicionalInfos(),
+                                                                           event.getSocialUser() )
                 .withLinkCommand( model.getLinkCommand() )
                 .withLinkParams( event.getLinkParams() );
 
@@ -130,11 +132,11 @@ public class SimpleSocialTimelineWidget extends Composite {
     }
 
     private void createSimpleWidget( SocialActivitiesEvent event ) {
-        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model,
-                event.getType(),
-                event.getTimestamp(),
-                event.getDescription(),
-                event.getAdicionalInfos() )
+        SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( event.getType(),
+                                                                    event.getTimestamp(),
+                                                                    event.getDescription(),
+                                                                    event.getAdicionalInfos(),
+                                                                    event.getSocialUser() )
                 .withLinkParams( event.getLinkParams() );
         addItemWidget( rowModel );
     }
@@ -147,7 +149,7 @@ public class SimpleSocialTimelineWidget extends Composite {
         if ( canICreateMoreLink() ) {
             list.add( model.getMore() );
         }
-        if(canICreateLessLink()||canICreateMoreLink()){
+        if ( canICreateLessLink() || canICreateMoreLink() ) {
             pagination.add( list );
         }
     }
@@ -188,7 +190,6 @@ public class SimpleSocialTimelineWidget extends Composite {
             }
         } );
     }
-
 
     interface MyUiBinder extends UiBinder<Widget, SimpleSocialTimelineWidget> {
 

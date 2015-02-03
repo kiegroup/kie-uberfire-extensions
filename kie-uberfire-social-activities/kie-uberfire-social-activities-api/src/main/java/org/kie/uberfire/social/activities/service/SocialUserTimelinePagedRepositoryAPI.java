@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.jboss.errai.bus.server.annotations.Remote;
 import org.kie.uberfire.social.activities.model.PagedSocialQuery;
+import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialUser;
 import org.kie.uberfire.social.activities.model.SocialPaged;
 
@@ -15,5 +16,9 @@ public interface SocialUserTimelinePagedRepositoryAPI {
 
     PagedSocialQuery getUserTimeline( SocialUser socialUser,
                                       SocialPaged socialPaged,
-                                      Map commandsMap );
+                                      SocialPredicate<SocialActivitiesEvent> predicate );
+
+    public PagedSocialQuery getUserTimeline( SocialUser socialUser,
+                                             SocialPaged socialPaged,
+                                             Map commandsMap,  SocialPredicate<SocialActivitiesEvent> predicate );
 }
