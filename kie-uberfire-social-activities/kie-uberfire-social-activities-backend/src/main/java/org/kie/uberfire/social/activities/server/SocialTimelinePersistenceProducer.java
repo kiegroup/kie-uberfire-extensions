@@ -19,7 +19,6 @@ package org.kie.uberfire.social.activities.server;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
@@ -36,9 +35,13 @@ import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
 import org.uberfire.commons.cluster.ClusterServiceFactory;
+import org.uberfire.commons.services.cdi.Startup;
+import org.uberfire.commons.services.cdi.StartupType;
 import org.uberfire.io.IOService;
+import org.uberfire.java.nio.file.FileSystem;
 
 @ApplicationScoped
+@Startup(StartupType.BOOTSTRAP)
 public class SocialTimelinePersistenceProducer {
 
     @Inject
@@ -56,6 +59,10 @@ public class SocialTimelinePersistenceProducer {
     private IOService ioService;
 
     @Inject
+    @Named("systemFS")
+    private FileSystem fileSystem;
+
+    @Inject
     SocialEventTypeRepositoryAPI socialEventTypeRepository;
 
     @Inject
@@ -71,9 +78,9 @@ public class SocialTimelinePersistenceProducer {
     public void setup() {
         gsonFactory();
         if ( clusterServiceFactory == null ) {
-            socialTimelinePersistenceAPI = new SocialTimelineCacheInstancePersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, userServicesBackend );
+            socialTimelinePersistenceAPI = new SocialTimelineCacheInstancePersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, userServicesBackend, fileSystem );
         } else {
-            socialTimelinePersistenceAPI = new SocialTimelineCacheClusterPersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, socialClusterMessaging, userServicesBackend );
+            socialTimelinePersistenceAPI = new SocialTimelineCacheClusterPersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, socialClusterMessaging, userServicesBackend, fileSystem );
         }
         socialTimelinePersistenceAPI.setup();
     }

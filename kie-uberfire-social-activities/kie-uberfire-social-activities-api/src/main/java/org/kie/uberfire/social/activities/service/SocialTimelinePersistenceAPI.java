@@ -3,10 +3,11 @@ package org.kie.uberfire.social.activities.service;
 import java.util.List;
 
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
-import org.kie.uberfire.social.activities.model.SocialUser;
 import org.kie.uberfire.social.activities.model.SocialEventType;
+import org.kie.uberfire.social.activities.model.SocialUser;
+import org.uberfire.commons.lifecycle.PriorityDisposable;
 
-public interface SocialTimelinePersistenceAPI {
+public interface SocialTimelinePersistenceAPI extends PriorityDisposable {
 
     void setup();
 

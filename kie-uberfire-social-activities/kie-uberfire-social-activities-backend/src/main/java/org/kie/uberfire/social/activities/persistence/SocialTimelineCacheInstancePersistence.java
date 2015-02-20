@@ -12,15 +12,17 @@ import org.kie.uberfire.social.activities.server.SocialUserServicesExtendedBackE
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
 import org.uberfire.io.IOService;
+import org.uberfire.java.nio.file.FileSystem;
 
 public class SocialTimelineCacheInstancePersistence extends SocialTimelineCachePersistence {
 
-    public SocialTimelineCacheInstancePersistence( Gson gson,
-                                                   Type gsonCollectionType,
-                                                   IOService ioService,
-                                                   SocialEventTypeRepositoryAPI socialEventTypeRepository,
-                                                   SocialUserPersistenceAPI socialUserService,
-                                                   SocialUserServicesExtendedBackEndImpl userServicesBackend ) {
+    public SocialTimelineCacheInstancePersistence( final Gson gson,
+                                                   final Type gsonCollectionType,
+                                                   final IOService ioService,
+                                                   final SocialEventTypeRepositoryAPI socialEventTypeRepository,
+                                                   final SocialUserPersistenceAPI socialUserService,
+                                                   final SocialUserServicesExtendedBackEndImpl userServicesBackend,
+                                                   final FileSystem fileSystem ) {
 
         this.gson = gson;
         this.gsonCollectionType = gsonCollectionType;
@@ -28,6 +30,7 @@ public class SocialTimelineCacheInstancePersistence extends SocialTimelineCacheP
         this.socialEventTypeRepository = socialEventTypeRepository;
         this.socialUserPersistenceAPI = socialUserService;
         this.userServicesBackend = userServicesBackend;
+        this.fileSystem = fileSystem;
     }
 
     @Override
@@ -88,5 +91,4 @@ public class SocialTimelineCacheInstancePersistence extends SocialTimelineCacheP
             socialCacheControl.reset();
         }
     }
-
 }

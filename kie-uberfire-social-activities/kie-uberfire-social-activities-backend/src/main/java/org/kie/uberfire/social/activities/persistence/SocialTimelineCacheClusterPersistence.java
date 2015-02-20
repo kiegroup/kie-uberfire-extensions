@@ -13,19 +13,21 @@ import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
 import org.uberfire.io.IOService;
+import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
 
 public class SocialTimelineCacheClusterPersistence extends SocialTimelineCachePersistence implements SocialTimelinePersistenceAPI {
 
     private SocialClusterMessaging socialClusterMessaging;
 
-    public SocialTimelineCacheClusterPersistence( Gson gson,
-                                                  Type gsonCollectionType,
-                                                  IOService ioService,
-                                                  SocialEventTypeRepositoryAPI socialEventTypeRepository,
-                                                  SocialUserPersistenceAPI socialUserPersistenceAPI,
-                                                  SocialClusterMessaging socialClusterMessaging,
-                                                  SocialUserServicesExtendedBackEndImpl userServicesBackend ) {
+    public SocialTimelineCacheClusterPersistence( final Gson gson,
+                                                  final Type gsonCollectionType,
+                                                  final IOService ioService,
+                                                  final SocialEventTypeRepositoryAPI socialEventTypeRepository,
+                                                  final SocialUserPersistenceAPI socialUserPersistenceAPI,
+                                                  final SocialClusterMessaging socialClusterMessaging,
+                                                  final SocialUserServicesExtendedBackEndImpl userServicesBackend,
+                                                  final FileSystem fileSystem ) {
 
         this.gson = gson;
         this.gsonCollectionType = gsonCollectionType;
@@ -34,6 +36,7 @@ public class SocialTimelineCacheClusterPersistence extends SocialTimelineCachePe
         this.socialUserPersistenceAPI = socialUserPersistenceAPI;
         this.socialClusterMessaging = socialClusterMessaging;
         this.userServicesBackend = userServicesBackend;
+        this.fileSystem = fileSystem;
     }
 
     @Override
