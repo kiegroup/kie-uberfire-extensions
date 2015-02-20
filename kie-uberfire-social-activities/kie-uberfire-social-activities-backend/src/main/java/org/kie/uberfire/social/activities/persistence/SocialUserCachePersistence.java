@@ -20,8 +20,6 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
 
     SocialUserServicesExtendedBackEndImpl userServicesBackend;
 
-    private final UserServicesImpl userServices;
-
     IOService ioService;
 
     private static final String SYSTEM_USER = "system";
@@ -39,7 +37,6 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
                                        IOService ioService,
                                        Gson gson ) {
         this.userServicesBackend = userServicesBackend;
-        this.userServices = userServices;
         this.ioService = ioService;
         this.gson = gson;
         userNamesPath = userServicesBackend.buildPath( SOCIAL_FILES, userNamesFileName );

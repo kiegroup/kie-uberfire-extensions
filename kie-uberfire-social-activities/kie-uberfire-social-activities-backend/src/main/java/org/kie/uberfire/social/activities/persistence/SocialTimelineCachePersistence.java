@@ -118,8 +118,8 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         updateLastIndexFile( timelineDir, lastIndex );
     }
 
-    private void updateLastIndexFile( Path directory,
-                                      String lastIndex ) {
+    private synchronized void updateLastIndexFile( Path directory,
+                                                   String lastIndex ) {
         Path lastFileIndex = directory.resolve( Constants.LAST_FILE_INDEX.name() );
         try {
             getIoService().startBatch( directory.getFileSystem() );
@@ -140,16 +140,15 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         return lastFileIndex.toString();
     }
 
-    private void writeItemsMetadata( Path timeLineDir,
-                                     String originalFilename,
-                                     int size ) {
+    private synchronized void writeItemsMetadata( Path timeLineDir,
+                                                  String originalFilename,
+                                                  int size ) {
         String metadataFileName = originalFilename + Constants.METADATA;
         Path timelineFile = timeLineDir.resolve( metadataFileName );
         try {
             getIoService().startBatch( timeLineDir.getFileSystem() );
             getIoService().write( timelineFile, size + "" );
-        }
-        finally {
+        } finally {
             getIoService().endBatch();
         }
     }
@@ -165,8 +164,8 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         return "-1";
     }
 
-    private void writeItems( Path timeLineFile,
-                             List<SocialActivitiesEvent> newEvents ) {
+    private synchronized void writeItems( final Path timeLineFile,
+                                          final List<SocialActivitiesEvent> newEvents ) {
         SocialFile socialFile = new SocialFile( timeLineFile, ioService, gson );
 
         try {
@@ -174,8 +173,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
             socialFile.write( newEvents );
         } catch ( IOException e ) {
             throw new ErrorAccessingTimeline( e );
-        }
-        finally {
+        } finally {
             ioService.endBatch();
         }
 
@@ -219,6 +217,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     }
 
     private class ErrorAccessingTimeline extends RuntimeException {
+
         public ErrorAccessingTimeline( Exception e ) {
             super( e );
         }
@@ -313,8 +312,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         if ( !ioService.exists( userDir ) ) {
             createPersistenceStructure( userDir );
         }
-        String fileName = persistEvents( newEvents, userDir );
-        return fileName;
+        return persistEvents( newEvents, userDir );
     }
 
     private Path getUserDirectory( String userName ) {

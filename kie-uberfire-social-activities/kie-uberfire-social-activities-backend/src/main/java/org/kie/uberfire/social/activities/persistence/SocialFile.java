@@ -26,15 +26,15 @@ public class SocialFile {
     private long currentCursorReadPosition;
     private ByteBuffer byteBufferSize;
 
-    public SocialFile( Path path,
-                       IOService ioService,
-                       Gson gson ) {
+    public SocialFile( final Path path,
+                       final IOService ioService,
+                       final Gson gson ) {
         try {
             JSON_SEPARATOR_BYTES = Hex.decodeHex( JSON_SEPARATOR.toCharArray() );
         } catch ( DecoderException e ) {
             throw new ErrorReadingFile();
         }
-        byteBufferSize = ByteBuffer.allocate( "a".getBytes().length );
+        this.byteBufferSize = ByteBuffer.allocate( "a".getBytes().length );
         this.path = path;
         this.gson = gson;
         this.currentCursorReadPosition = -1;
