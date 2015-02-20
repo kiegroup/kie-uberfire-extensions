@@ -51,7 +51,7 @@ public class SocialUserPersistenceProducer {
     private Type gsonCollectionType;
 
     @Inject
-    @Named("configIO")
+    @Named("ioStrategy")
     private IOService ioService;
 
     @Inject

@@ -52,7 +52,7 @@ public class SocialTimelinePersistenceProducer {
     private Type gsonCollectionType;
 
     @Inject
-    @Named("configIO")
+    @Named("ioStrategy")
     private IOService ioService;
 
     @Inject
