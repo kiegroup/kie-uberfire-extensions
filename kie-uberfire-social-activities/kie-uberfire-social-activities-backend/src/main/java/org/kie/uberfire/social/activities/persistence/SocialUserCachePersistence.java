@@ -40,14 +40,22 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
         this.ioService = ioService;
         this.gson = gson;
         this.userNamesPath = userServicesBackend.buildPath( SOCIAL_FILES, userNamesFileName );
+    }
 
+    @Override
+    public void setup(){
         syncSocialUsers();
     }
 
     private void syncSocialUsers() {
-        List<String> users = createUserNamesFile();
-        usersNamesCache.addAll( users );
-        createSocialUserCache( users );
+        try {
+            ioService.startBatch( userNamesPath.getFileSystem() );
+            List<String> users = createUserNamesFile();
+            usersNamesCache.addAll( users );
+            createSocialUserCache( users );
+        } finally {
+            ioService.endBatch();
+        }
     }
 
     @Override
@@ -56,7 +64,7 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
     }
 
     @Override
-    public synchronized SocialUser getSocialUser( String userName ) {
+    public SocialUser getSocialUser( String userName ) {
         syncUserNamesCacheAndFile( userName );
         return usersCache.get( userName );
     }

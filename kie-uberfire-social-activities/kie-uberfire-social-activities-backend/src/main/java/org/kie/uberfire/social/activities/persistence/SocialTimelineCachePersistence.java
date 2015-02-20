@@ -16,6 +16,7 @@ import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
 import org.uberfire.io.IOService;
+import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
 
 public abstract class SocialTimelineCachePersistence implements SocialTimelinePersistenceAPI {
@@ -31,6 +32,8 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     private static final int DEFAULT_THRESHOLD = 100;
 
     IOService ioService;
+
+    FileSystem fileSystem;
 
     Gson gson;
 
@@ -68,7 +71,6 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
             userEventsTimelineCache.put( username, events );
             userEventsTimelineFreshEvents.put( username, new ArrayList<SocialActivitiesEvent>() );
         }
-
     }
 
     List<SocialActivitiesEvent> createOrGetTimeline( Path timelineDir ) {
@@ -118,8 +120,8 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         updateLastIndexFile( timelineDir, lastIndex );
     }
 
-    private synchronized void updateLastIndexFile( Path directory,
-                                                   String lastIndex ) {
+    private void updateLastIndexFile( Path directory,
+                                      String lastIndex ) {
         Path lastFileIndex = directory.resolve( Constants.LAST_FILE_INDEX.name() );
         try {
             getIoService().startBatch( lastFileIndex.getFileSystem() );
@@ -145,9 +147,9 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         }
     }
 
-    private synchronized void writeItemsMetadata( Path timeLineDir,
-                                                  String originalFilename,
-                                                  int size ) {
+    private void writeItemsMetadata( Path timeLineDir,
+                                     String originalFilename,
+                                     int size ) {
         String metadataFileName = originalFilename + Constants.METADATA;
         Path timelineFile = timeLineDir.resolve( metadataFileName );
         try {
@@ -169,8 +171,8 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         return "-1";
     }
 
-    private synchronized void writeItems( final Path timeLineFile,
-                                          final List<SocialActivitiesEvent> newEvents ) {
+    private void writeItems( final Path timeLineFile,
+                             final List<SocialActivitiesEvent> newEvents ) {
         SocialFile socialFile = new SocialFile( timeLineFile, ioService, gson );
 
         try {
@@ -306,9 +308,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     Map<String, SocialCacheControl> userEventsCacheControl = new HashMap<String, SocialCacheControl>();
 
     List<SocialActivitiesEvent> createOrGetUserTimeline( String userName ) {
-        Path timelineDir = getRootUserTimelineDirectory();
-        Path userFile = timelineDir.resolve( userName );
-        return createOrGetTimeline( userFile );
+        return createOrGetTimeline( getRootUserTimelineDirectory().resolve( userName ) );
     }
 
     private String persistEvents( SocialUser user,
@@ -366,9 +366,9 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         userEventsTimelineFreshEvents.put( userName, new ArrayList<SocialActivitiesEvent>() );
         userEventsTimelineCache.put( userName, socialActivitiesEvents );
     }
+
     Path getRootUserTimelineDirectory() {
-        Path path = userServicesBackend.buildPath( SOCIAL_FILES, Constants.USER_TIMELINE.name() );
-        return path;
+        return userServicesBackend.buildPath( SOCIAL_FILES, Constants.USER_TIMELINE.name() );
     }
 
     @Override
@@ -427,5 +427,15 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
                                             String originalFilename ) {
         Path userDirectory = getUserDirectory( socialUser.getUserName() );
         return getNumberOfEventsOnPath( originalFilename, userDirectory );
+    }
+
+    @Override
+    public int priority() {
+        return Integer.MAX_VALUE - 200;
+    }
+
+    @Override
+    public void dispose() {
+        saveAllEvents();
     }
 }

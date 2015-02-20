@@ -6,6 +6,8 @@ import org.kie.uberfire.social.activities.model.SocialUser;
 
 public interface SocialUserPersistenceAPI {
 
+    void setup();
+
     List<String> getSocialUsersName();
 
     SocialUser getSocialUser( String userName );

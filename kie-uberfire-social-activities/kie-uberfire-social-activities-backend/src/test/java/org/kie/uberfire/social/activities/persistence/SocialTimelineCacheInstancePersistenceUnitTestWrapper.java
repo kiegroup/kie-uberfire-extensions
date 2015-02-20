@@ -16,7 +16,7 @@ import org.uberfire.io.IOService;
 public class SocialTimelineCacheInstancePersistenceUnitTestWrapper extends SocialTimelineCacheInstancePersistence {
 
     public SocialTimelineCacheInstancePersistenceUnitTestWrapper() {
-        super( null, null, null, null, null, null );
+        super( null, null, null, null, null, null, null );
     }
 
     public SocialTimelineCacheInstancePersistenceUnitTestWrapper( Gson gson,
@@ -24,7 +24,7 @@ public class SocialTimelineCacheInstancePersistenceUnitTestWrapper extends Socia
                                                                   IOService ioService,
                                                                   SocialEventTypeRepository socialEventTypeRepository,
                                                                   SocialUserClusterPersistence socialUserService ) {
-        super( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserService, null );
+        super( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserService, null, null );
     }
 
     @Override
