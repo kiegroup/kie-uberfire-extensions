@@ -7,17 +7,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.uberfire.io.IOService;
 import org.uberfire.java.nio.base.AbstractPath;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
 
 @ApplicationScoped
 public class SocialUserServicesExtendedBackEndImpl {
-
-    @Inject
-    @Named("configIO")
-    private IOService ioService;
 
     @Inject
     @Named("systemFS")

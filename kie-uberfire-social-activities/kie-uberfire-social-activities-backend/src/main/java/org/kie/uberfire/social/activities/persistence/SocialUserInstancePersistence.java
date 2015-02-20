@@ -13,14 +13,14 @@ public class SocialUserInstancePersistence extends SocialUserCachePersistence {
                                           UserServicesImpl userServices,
                                           IOService ioService,
                                           Gson gson ) {
-        super( userServicesBackend,userServices,  ioService, gson );
+        super( userServicesBackend, userServices, ioService, gson );
     }
 
     @Override
     public void updateUsers( SocialUser... users ) {
         for ( SocialUser user : users ) {
             usersCache.put( user.getUserName(), user );
-            Path userFile =userServicesBackend.buildPath( SOCIAL_FILES,user.getUserName() );
+            Path userFile = userServicesBackend.buildPath( SOCIAL_FILES, user.getUserName() );
             try {
                 String json = gson.toJson( user );
                 ioService.write( userFile, json );
