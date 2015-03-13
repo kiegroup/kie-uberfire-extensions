@@ -42,15 +42,21 @@ public class SocialFile {
     }
 
     public void write( List<SocialActivitiesEvent> events ) throws IOException {
-        SeekableByteChannel sbc = ioService.newByteChannel( path );
-        for ( SocialActivitiesEvent event : events ) {
-            String json = gson.toJson( event );
-            writeJson( json, sbc );
-            writeSeparator( sbc );
-            writeJsonSize( sbc, json );
-            writeSeparator( sbc );
+        try {
+            ioService.startBatch( path.getFileSystem() );
+
+            SeekableByteChannel sbc = ioService.newByteChannel( path );
+            for ( SocialActivitiesEvent event : events ) {
+                String json = gson.toJson( event );
+                writeJson( json, sbc );
+                writeSeparator( sbc );
+                writeJsonSize( sbc, json );
+                writeSeparator( sbc );
+            }
+            sbc.close();
+        } finally {
+            ioService.endBatch();
         }
-        sbc.close();
     }
 
     private void writeJsonSize( SeekableByteChannel sbc,

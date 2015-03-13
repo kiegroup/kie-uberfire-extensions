@@ -78,11 +78,6 @@ public class SocialTimelinePersistenceProducer {
         socialTimelinePersistenceAPI.setup();
     }
 
-    @PreDestroy
-    public void onShutdown() {
-        socialTimelinePersistenceAPI.saveAllEvents();
-    }
-
     @Produces
     @Named("socialTimelinePersistence")
     public SocialTimelinePersistenceAPI socialTimelinePersistenceAPI() {

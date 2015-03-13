@@ -32,14 +32,14 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
 
     List<String> usersNamesCache = new ArrayList<String>();
 
-    public SocialUserCachePersistence( SocialUserServicesExtendedBackEndImpl userServicesBackend,
-                                       UserServicesImpl userServices,
-                                       IOService ioService,
-                                       Gson gson ) {
+    public SocialUserCachePersistence( final SocialUserServicesExtendedBackEndImpl userServicesBackend,
+                                       final UserServicesImpl userServices,
+                                       final IOService ioService,
+                                       final Gson gson ) {
         this.userServicesBackend = userServicesBackend;
         this.ioService = ioService;
         this.gson = gson;
-        userNamesPath = userServicesBackend.buildPath( SOCIAL_FILES, userNamesFileName );
+        this.userNamesPath = userServicesBackend.buildPath( SOCIAL_FILES, userNamesFileName );
 
         syncSocialUsers();
     }
@@ -68,13 +68,17 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
             Path userFile = userServicesBackend.buildPath( SOCIAL_FILES, username );
             if ( ioService.exists( userFile ) ) {
                 String json = ioService.readAllString( userFile );
-                SocialUser socialUser = gson.fromJson( json, SocialUser.class );
-                return socialUser;
+                return gson.fromJson( json, SocialUser.class );
             } else {
-                SocialUser newSocialUser = new SocialUser( username );
-                String json = gson.toJson( newSocialUser );
-                ioService.write( userFile, json );
-                return newSocialUser;
+                try {
+                    ioService.startBatch( userFile.getFileSystem() );
+                    SocialUser newSocialUser = new SocialUser( username );
+                    String json = gson.toJson( newSocialUser );
+                    ioService.write( userFile, json );
+                    return newSocialUser;
+                } finally {
+                    ioService.endBatch();
+                }
             }
         } catch ( Exception e ) {
             throw new ErrorCreatingOrRetrievingUserData( e );
@@ -84,8 +88,12 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
     public abstract void updateUsers( SocialUser... users );
 
     void writeUserNamesOnFile( List<String> userNames ) {
-        String json = gson.toJson( userNames );
-        ioService.write( userNamesPath, json );
+        try {
+            ioService.startBatch( userNamesPath.getFileSystem() );
+            ioService.write( userNamesPath, gson.toJson( userNames ) );
+        } finally {
+            ioService.endBatch();
+        }
     }
 
     private void createSocialUserCache( List<String> users ) {
@@ -135,7 +143,7 @@ public abstract class SocialUserCachePersistence implements SocialUserPersistenc
     }
 
     private boolean notAMergedBranch( String cleanName ) {
-        return !cleanName.contains( "upstream" )&&!cleanName.contains( "@" );
+        return !cleanName.contains( "upstream" ) && !cleanName.contains( "@" );
     }
 
     private void createSystemUser( List<String> userNames ) {

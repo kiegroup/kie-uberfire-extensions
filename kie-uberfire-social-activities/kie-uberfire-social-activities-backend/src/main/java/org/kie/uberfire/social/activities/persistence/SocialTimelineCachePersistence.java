@@ -122,7 +122,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
                                                    String lastIndex ) {
         Path lastFileIndex = directory.resolve( Constants.LAST_FILE_INDEX.name() );
         try {
-            getIoService().startBatch( directory.getFileSystem() );
+            getIoService().startBatch( lastFileIndex.getFileSystem() );
             getIoService().write( lastFileIndex, lastIndex );
         } finally {
             getIoService().endBatch();
@@ -134,10 +134,15 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         Integer lastFileIndex = getLastFileIndex( timeLineDir );
         lastFileIndex = lastFileIndex + 1;
         Path timelineFile = timeLineDir.resolve( lastFileIndex.toString() );
-        writeItems( timelineFile, newEvents );
-        writeItemsMetadata( timeLineDir, lastFileIndex.toString(), newEvents.size() );
-        updateLastIndexFile( timeLineDir, lastFileIndex.toString() );
-        return lastFileIndex.toString();
+        try {
+            getIoService().startBatch( timeLineDir.getFileSystem() );
+            writeItems( timelineFile, newEvents );
+            writeItemsMetadata( timeLineDir, lastFileIndex.toString(), newEvents.size() );
+            updateLastIndexFile( timeLineDir, lastFileIndex.toString() );
+            return lastFileIndex.toString();
+        } finally {
+            getIoService().endBatch();
+        }
     }
 
     private synchronized void writeItemsMetadata( Path timeLineDir,
@@ -146,7 +151,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         String metadataFileName = originalFilename + Constants.METADATA;
         Path timelineFile = timeLineDir.resolve( metadataFileName );
         try {
-            getIoService().startBatch( timeLineDir.getFileSystem() );
+            getIoService().startBatch( timelineFile.getFileSystem() );
             getIoService().write( timelineFile, size + "" );
         } finally {
             getIoService().endBatch();
@@ -315,7 +320,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         return persistEvents( newEvents, userDir );
     }
 
-    private Path getUserDirectory( String userName ) {
+    Path getUserDirectory( String userName ) {
         Path directory = getRootUserTimelineDirectory();
         return directory.resolve( userName );
     }
@@ -352,16 +357,15 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     List<SocialActivitiesEvent> storeTimeLineInFile( SocialUser user ) {
         List<SocialActivitiesEvent> socialActivitiesEvents = userEventsTimelineFreshEvents.get( user.getUserName() );
         persistEvents( user, socialActivitiesEvents );
-        refreshCache( user, socialActivitiesEvents );
+        refreshCache( user.getUserName(), socialActivitiesEvents );
         return socialActivitiesEvents;
     }
 
-    void refreshCache( SocialUser user,
+    void refreshCache( String userName,
                        List<SocialActivitiesEvent> socialActivitiesEvents ) {
-        userEventsTimelineFreshEvents.put( user.getUserName(), new ArrayList<SocialActivitiesEvent>() );
-        userEventsTimelineCache.put( user.getUserName(), socialActivitiesEvents );
+        userEventsTimelineFreshEvents.put( userName, new ArrayList<SocialActivitiesEvent>() );
+        userEventsTimelineCache.put( userName, socialActivitiesEvents );
     }
-
     Path getRootUserTimelineDirectory() {
         Path path = userServicesBackend.buildPath( SOCIAL_FILES, Constants.USER_TIMELINE.name() );
         return path;
