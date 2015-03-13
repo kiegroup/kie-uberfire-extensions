@@ -55,7 +55,7 @@ public class SocialUserPersistenceProducer {
     private IOService ioService;
 
     @Inject
-    SocialEventTypeRepositoryAPI socialEventTypeRepository;
+    private SocialEventTypeRepositoryAPI socialEventTypeRepository;
 
     @Inject
     private SocialUserServicesExtendedBackEndImpl userServicesBackend;

@@ -29,7 +29,6 @@ public class SocialUserServicesExtendedBackEndImpl {
 
     public Path buildPath( final String serviceType,
                            final String relativePath ) {
-
         if ( relativePath != null && !"".equals( relativePath ) ) {
             return fileSystem.getPath( "social", serviceType, relativePath );
         } else {

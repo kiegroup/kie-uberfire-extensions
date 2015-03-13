@@ -35,22 +35,15 @@ public class SocialConfiguration {
     @PostConstruct
     public void setup() {
         final String property = System.getProperty( "org.kie.uberfire.social.activities.enable" );
-        if(property!=null){
+        if ( property != null ) {
             socialEnable = Boolean.parseBoolean( property );
-        }
-        else{
-            if(clusterServiceFactory==null){
-                socialEnable = Boolean.TRUE;
-            }
-            else{
-                socialEnable = Boolean.FALSE;
-            }
-
+        } else {
+            socialEnable = Boolean.TRUE;
         }
     }
 
-    public Boolean isSocialEnable(){
-       return socialEnable;
+    public Boolean isSocialEnable() {
+        return socialEnable;
     }
 
 }

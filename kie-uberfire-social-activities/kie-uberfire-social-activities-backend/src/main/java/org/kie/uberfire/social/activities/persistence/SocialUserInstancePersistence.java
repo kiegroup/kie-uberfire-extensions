@@ -22,10 +22,12 @@ public class SocialUserInstancePersistence extends SocialUserCachePersistence {
             usersCache.put( user.getUserName(), user );
             Path userFile = userServicesBackend.buildPath( SOCIAL_FILES, user.getUserName() );
             try {
-                String json = gson.toJson( user );
-                ioService.write( userFile, json );
+                ioService.startBatch( userFile.getFileSystem() );
+                ioService.write( userFile, gson.toJson( user ) );
             } catch ( Exception e ) {
                 throw new ErrorUpdatingUsers( e );
+            } finally {
+                ioService.endBatch();
             }
         }
     }
