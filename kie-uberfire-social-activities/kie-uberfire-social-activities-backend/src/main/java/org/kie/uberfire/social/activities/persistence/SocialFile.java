@@ -8,7 +8,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.channels.SeekableByteChannel;
