@@ -1,46 +1,43 @@
 package org.kie.uberfire.social.activities.client.gravatar;
 
-import com.github.gwtbootstrap.client.ui.Image;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.ui.Image;
 import org.kie.uberfire.social.activities.client.AppResource;
 import org.kie.uberfire.social.activities.model.SocialUser;
+import org.kie.uberfire.social.activities.service.SocialUserImageRepositoryAPI.ImageSize;
 
 public class GravatarBuilder {
 
-    public enum SIZE {
-        SMALL, BIG, MICRO
-    }
-
     public static Image generate( SocialUser socialUser,
-                                  SIZE size ) {
+                                  ImageSize imageSize ) {
         if ( socialUser.getEmail().isEmpty() ) {
-            return generateDefaultImage( size );
+            return generateDefaultImage( imageSize );
         } else {
-            return generateGravatarImage( socialUser, size );
+            return generateGravatarImage( socialUser, imageSize );
         }
     }
 
     private static Image generateGravatarImage( SocialUser socialUser,
 
-                                                SIZE size ) {
+                                                ImageSize imageSize ) {
         Image gravatarImage;
-        if ( size == SIZE.MICRO ) {
+        if ( imageSize == ImageSize.MICRO ) {
             gravatarImage = new Image( new GravatarImage( socialUser.getEmail(), 15 ).getUrl() );
-        } else if ( size == SIZE.SMALL ) {
+        } else if ( imageSize == ImageSize.SMALL ) {
             gravatarImage = new Image( new GravatarImage( socialUser.getEmail(), 30 ).getUrl() );
-        } else   {
+        } else {
             gravatarImage = new Image( new GravatarImage( socialUser.getEmail(), 200 ).getUrl() );
         }
 
         return gravatarImage;
     }
 
-    private static Image generateDefaultImage( SIZE size ) {
+    private static Image generateDefaultImage( ImageSize size ) {
         Image userImage;
-        if ( size == SIZE.MICRO ) {
+        if ( size == ImageSize.MICRO ) {
             ImageResource imageResource = AppResource.INSTANCE.images().genericAvatar15px();
             userImage = new Image( imageResource );
-        } else if ( size == SIZE.SMALL ) {
+        } else if ( size == ImageSize.SMALL ) {
             ImageResource imageResource = AppResource.INSTANCE.images().genericAvatar30px();
             userImage = new Image( imageResource );
 

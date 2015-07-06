@@ -1,20 +1,23 @@
 package org.kie.uberfire.social.activities.client.widgets.item;
 
-import com.github.gwtbootstrap.client.ui.Column;
-import com.github.gwtbootstrap.client.ui.Image;
-import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
-import org.kie.uberfire.social.activities.client.gravatar.GravatarBuilder;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.ImageAnchor;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.jboss.errai.ioc.client.container.IOC;
+import org.kie.uberfire.social.activities.client.user.SocialUserImageProvider;
 import org.kie.uberfire.social.activities.client.widgets.timeline.regular.model.UpdateItem;
-import org.kie.uberfire.social.activities.client.widgets.userbox.UserBoxView;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialUser;
+import org.kie.uberfire.social.activities.service.SocialUserImageRepositoryAPI.ImageSize;
 
 public class CommentRowWidget extends Composite {
 
@@ -23,13 +26,22 @@ public class CommentRowWidget extends Composite {
     private static MyUiBinder uiBinder = GWT.create( MyUiBinder.class );
 
     @UiField
-    Column thumbnail;
+    FlowPanel left;
 
     @UiField
-    Column addInfo;
+    Paragraph desc;
+
+    @UiField
+    Heading heading;
+
+    SocialUserImageProvider imageProvider;
 
     interface MyUiBinder extends UiBinder<Widget, CommentRowWidget> {
 
+    }
+
+    public CommentRowWidget() {
+        imageProvider = IOC.getBeanManager().lookupBean( SocialUserImageProvider.class ).getInstance();
     }
 
     public void init( UpdateItem model ) {
@@ -38,13 +50,17 @@ public class CommentRowWidget extends Composite {
     }
 
     public void createItem( UpdateItem updateItem ) {
-
         createThumbNail( updateItem );
         createAdditionalInfo( updateItem.getEvent() );
+        createUserInfo( updateItem.getEvent().getSocialUser() );
+    }
+
+    private void createUserInfo( final SocialUser socialUser ) {
+        heading.setText( socialUser.getName() );
     }
 
     private void createAdditionalInfo( SocialActivitiesEvent event ) {
-        StringBuilder comment = new StringBuilder();
+        final StringBuilder comment = new StringBuilder();
         comment.append( event.getAdicionalInfos() );
         comment.append( " " );
         comment.append( FORMATTER.format( event.getTimestamp() ) );
@@ -52,26 +68,16 @@ public class CommentRowWidget extends Composite {
         if ( event.getDescription() != null && !event.getDescription().isEmpty() ) {
             comment.append( "\"" + event.getDescription() + "\"" );
         }
-        addInfo.add( new Paragraph( comment.toString() ) );
+        desc.add( new Text( comment.toString() ) );
     }
 
     private void createThumbNail( UpdateItem updateItem ) {
-
-        UserBoxView followerView = GWT.create( UserBoxView.class );
-        SocialUser socialUser = updateItem.getEvent().getSocialUser();
-        Image userImage = GravatarBuilder.generate( socialUser, GravatarBuilder.SIZE.MICRO );
-        UserBoxView.RelationType relationType = findRelationTypeWithLoggedUser( socialUser, updateItem.getLoggedUser() );
-        followerView.init( socialUser, relationType, userImage, updateItem.getUserClickCommand(), updateItem.getFollowUnfollowCommand() );
-        thumbnail.add( followerView );
-    }
-    private UserBoxView.RelationType findRelationTypeWithLoggedUser( SocialUser socialUser,
-                                                                     SocialUser loggedUser ) {
-        if ( socialUser.getUserName().equalsIgnoreCase( loggedUser.getUserName() ) ) {
-            return UserBoxView.RelationType.ME;
-        } else {
-            return socialUser.getFollowersName().contains( loggedUser.getUserName() ) ?
-                    UserBoxView.RelationType.UNFOLLOW : UserBoxView.RelationType.CAN_FOLLOW;
-        }
+        final SocialUser socialUser = updateItem.getEvent().getSocialUser();
+        final Image userImage = imageProvider.getImageForSocialUser( socialUser, ImageSize.SMALL );
+        final ImageAnchor newImage = new ImageAnchor();
+        newImage.setUrl( userImage.getUrl() );
+        newImage.setAsMediaObject( true );
+        left.add( newImage );
     }
 
 }

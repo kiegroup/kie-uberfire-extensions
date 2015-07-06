@@ -7,5 +7,7 @@
 
   <source path='model'/>
   <source path='service'/>
+  <source path='events'/>
+  <source path='utils'/>
 
 </module>

@@ -104,6 +104,10 @@ public class SocialUser implements Serializable {
                 '}';
     }
 
+    public String getName() {
+        return getRealName().isEmpty() ? getUserName() : getRealName();
+    }
+
     @Override
     public boolean equals( Object o ) {
         if ( this == o ) {

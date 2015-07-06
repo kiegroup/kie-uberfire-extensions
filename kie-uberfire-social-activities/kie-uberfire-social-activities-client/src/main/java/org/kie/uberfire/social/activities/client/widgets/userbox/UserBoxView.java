@@ -18,10 +18,8 @@ package org.kie.uberfire.social.activities.client.widgets.userbox;
 
 import javax.enterprise.context.Dependent;
 
-import com.github.gwtbootstrap.client.ui.Image;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.NavList;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
@@ -29,9 +27,20 @@ import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.Caption;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.ThumbnailPanel;
+import org.gwtbootstrap3.client.ui.constants.ImageType;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.jboss.errai.ioc.client.container.IOC;
+import org.kie.uberfire.social.activities.client.user.SocialUserImageProvider;
+import org.kie.uberfire.social.activities.client.widgets.utils.FollowButton;
+import org.kie.uberfire.social.activities.client.widgets.utils.FollowButton.FollowType;
 import org.kie.uberfire.social.activities.model.SocialUser;
+import org.kie.uberfire.social.activities.service.SocialUserImageRepositoryAPI.ImageSize;
+import org.uberfire.mvp.Command;
 import org.uberfire.mvp.ParameterizedCommand;
 
 @Dependent
@@ -46,84 +55,95 @@ public class UserBoxView extends Composite {
     private static HeaderViewBinder uiBinder = GWT.create( HeaderViewBinder.class );
 
     @UiField
-    FlowPanel userBoxPanel;
+    Caption caption;
+
     @UiField
-    FlowPanel followLink;
+    ThumbnailPanel panel;
+
     @UiField
-    FlowPanel panel;
+    Heading username;
+
+    @UiField
+    Paragraph desc;
+
+    private SocialUserImageProvider userImageProvider;
+
+    public UserBoxView() {
+        userImageProvider = IOC.getBeanManager().lookupBean( SocialUserImageProvider.class ).getInstance();
+    }
 
     public void init( final SocialUser socialUser,
-                      RelationType type,
-                      Image userImage,
+                      final RelationType type,
                       final ParameterizedCommand<String> onClick,
                       final ParameterizedCommand<String> followUnfollowCommand ) {
         initWidget( uiBinder.createAndBindUi( this ) );
-        setupUserBox( socialUser, userImage, onClick );
-        setupFollowUnfollow( socialUser, type, userImage, onClick, followUnfollowCommand );
+
+        setupUserBox( socialUser, userImageProvider.getImageForSocialUser( socialUser, ImageSize.BIG ), onClick );
+        setupFollowUnfollow( socialUser, type, followUnfollowCommand );
     }
 
     private void setupFollowUnfollow( final SocialUser socialUser,
-                                      RelationType type,
-                                      Image userImage,
-                                      final ParameterizedCommand<String> onClick,
+                                      final RelationType type,
                                       final ParameterizedCommand<String> followUnfollowCommand ) {
-        if ( type != RelationType.ME ) {
-            panel.addDomHandler( new MouseEventHandler( socialUser, type, userImage, onClick, followUnfollowCommand ), MouseOverEvent.getType() );
+        if ( type != RelationType.ME && followUnfollowCommand != null ) {
+            final FollowButton.FollowType followType = type == RelationType.UNFOLLOW ? FollowType.UNFOLLOW : FollowType.FOLLOW;
+            final Command wrapper = new Command() {
+                @Override
+                public void execute() {
+                    followUnfollowCommand.execute( socialUser.getUserName() );
+                }
+            };
+            final FollowButton button = new FollowButton( followType, wrapper );
+            button.addStyleName( "center-block" );
+            caption.add( button );
         }
     }
 
     private void setupUserBox( final SocialUser socialUser,
                                Image userImage,
                                final ParameterizedCommand<String> onClick ) {
-        userImage.addClickHandler( new ClickHandler() {
-            @Override
-            public void onClick( ClickEvent event ) {
-                onClick.execute( socialUser.getUserName() );
-            }
-        } );
-        userBoxPanel.add( userImage );
-        userBoxPanel.add( createLink( socialUser, onClick ) );
-        userBoxPanel.asWidget();
+        final org.gwtbootstrap3.client.ui.Image image = new org.gwtbootstrap3.client.ui.Image( userImage.getUrl() );
+        image.setType( ImageType.CIRCLE );
+        image.setPixelSize( 140, 140 );
+        if ( onClick != null ) {
+            image.addClickHandler( new ClickHandler() {
+                @Override
+                public void onClick( ClickEvent event ) {
+                    onClick.execute( socialUser.getUserName() );
+                }
+            } );
+        }
+        panel.insert( image, 0 );
+        createLink( socialUser, onClick );
+        if ( socialUser.getEmail().isEmpty() ) {
+            //Hide element so that box is the same size for all users
+            desc.getElement().getStyle().setVisibility( Style.Visibility.HIDDEN );
+            desc.setText( "." );
+        } else {
+            desc.setText( socialUser.getEmail() );
+        }
     }
 
-    private NavList createLink( final SocialUser follower,
-                                final ParameterizedCommand<String> command ) {
-        NavList list = new NavList();
-        NavLink link = new NavLink();
-        link.setText( follower.getUserName() );
-        link.addClickHandler( new ClickHandler() {
-            @Override
-            public void onClick( ClickEvent event ) {
-                command.execute( follower.getUserName() );
-            }
-        } );
-        list.add( link );
-        return list;
+    private void createLink( final SocialUser follower, final ParameterizedCommand<String> command ) {
+        username.setText( follower.getName() );
+        if ( command != null ) {
+            username.addDomHandler( new ClickHandler() {
+                @Override
+                public void onClick( ClickEvent event ) {
+                    command.execute( follower.getUserName() );
+                }
+            }, ClickEvent.getType() );
+            username.addDomHandler( new MouseOverHandler() {
+                @Override
+                public void onMouseOver( MouseOverEvent event ) {
+                    username.getElement().getStyle().setCursor( Style.Cursor.POINTER );
+                }
+            }, MouseOverEvent.getType() );
+        }
     }
 
-    class MouseEventHandler implements MouseOverHandler {
-
-        private final SocialUser socialUser;
-        private final RelationType type;
-        private final Image userImage;
-        private final ParameterizedCommand<String> onClick;
-        private final ParameterizedCommand<String> followUnfollowCommand;
-
-        public MouseEventHandler( final SocialUser socialUser,
-                                  RelationType type,
-                                  Image userImage,
-                                  final ParameterizedCommand<String> onClick,
-                                  final ParameterizedCommand<String> followUnfollowCommand ) {
-            this.socialUser = socialUser;
-            this.type = type;
-            this.userImage = userImage;
-            this.onClick = onClick;
-            this.followUnfollowCommand = followUnfollowCommand;
-        }
-
-        public void onMouseOver( final MouseOverEvent moe ) {
-            new UserBoxDetailsView( asWidget(), socialUser, type, userImage, onClick, followUnfollowCommand ).show();
-        }
+    public String getUserName() {
+        return username.getText();
     }
 
     public enum RelationType {

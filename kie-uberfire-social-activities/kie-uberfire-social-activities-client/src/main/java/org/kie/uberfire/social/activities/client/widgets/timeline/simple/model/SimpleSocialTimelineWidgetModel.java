@@ -2,9 +2,9 @@ package org.kie.uberfire.social.activities.client.widgets.timeline.simple.model;
 
 import java.util.List;
 
-import com.github.gwtbootstrap.client.ui.NavLink;
 import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
-import org.kie.uberfire.social.activities.client.widgets.timeline.regular.model.SocialTimelineWidgetModel;
+import org.kie.uberfire.social.activities.client.widgets.pagination.Next;
+import org.kie.uberfire.social.activities.client.widgets.pagination.Previous;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialEventType;
 import org.kie.uberfire.social.activities.model.SocialPaged;
@@ -21,8 +21,8 @@ public class SimpleSocialTimelineWidgetModel {
     private SocialPredicate<SocialActivitiesEvent> predicate;
     private PlaceManager placeManager;
     private SocialPaged socialPaged;
-    private NavLink less;
-    private NavLink more;
+    private Previous less;
+    private Next more;
     private List<ClientResourceType> resourceTypes;
     private ParameterizedCommand<LinkCommandParams> linkCommand;
 
@@ -46,8 +46,8 @@ public class SimpleSocialTimelineWidgetModel {
         this.socialPaged = socialPaged;
     }
 
-    public SimpleSocialTimelineWidgetModel withPagination( NavLink less,
-                                                           NavLink more ) {
+    public SimpleSocialTimelineWidgetModel withPagination( Previous less,
+                                                           Next more ) {
         this.less = less;
         this.more = more;
         return this;
@@ -64,7 +64,7 @@ public class SimpleSocialTimelineWidgetModel {
         return this;
     }
 
-    public SimpleSocialTimelineWidgetModel withOnlyMorePagination( NavLink more ) {
+    public SimpleSocialTimelineWidgetModel withOnlyMorePagination( Next more ) {
         this.more = more;
         return this;
     }
@@ -93,11 +93,11 @@ public class SimpleSocialTimelineWidgetModel {
         return socialEventType;
     }
 
-    public NavLink getLess() {
+    public Previous getLess() {
         return less;
     }
 
-    public NavLink getMore() {
+    public Next getMore() {
         return more;
     }
 

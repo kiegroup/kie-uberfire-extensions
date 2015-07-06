@@ -7,13 +7,9 @@
 
   <inherits name="org.uberfire.UberfireClientAll"/>
   <inherits name="org.uberfire.UberfireAPI"/>
+  <inherits name="org.uberfire.client.views.PatternFly"/>
 
   <inherits name="org.kie.uberfire.social.activities.SocialActivitiesAPI"/>
 
-
-  <!-- inherit css based theme -->
-  <inherits name='com.google.gwt.user.theme.clean.Clean'/>
-
-  <inherits name="com.github.gwtbootstrap.Bootstrap"/>
   <inherits name="com.googlecode.gwt.crypto.Crypto"/>
 </module>

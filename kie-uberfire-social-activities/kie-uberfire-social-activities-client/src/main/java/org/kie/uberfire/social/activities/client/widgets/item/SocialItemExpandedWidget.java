@@ -1,18 +1,18 @@
 package org.kie.uberfire.social.activities.client.widgets.item;
 
-import com.github.gwtbootstrap.client.ui.Column;
-import com.github.gwtbootstrap.client.ui.Container;
-import com.github.gwtbootstrap.client.ui.FluidContainer;
-import com.github.gwtbootstrap.client.ui.Image;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.NavList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.ImageAnchor;
+import org.gwtbootstrap3.client.ui.MediaList;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
@@ -32,13 +32,13 @@ public class SocialItemExpandedWidget extends Composite {
     private static final com.google.gwt.user.client.ui.Image GENERIC_FILE_IMAGE = new com.google.gwt.user.client.ui.Image( UberfireResources.INSTANCE.images().typeGenericFile() );
 
     @UiField
-    Column icon;
+    FlowPanel left;
 
     @UiField
-    Column file;
+    Paragraph desc;
 
     @UiField
-    FluidContainer table;
+    MediaList items;
 
     interface MyUiBinder extends UiBinder<Widget, SocialItemExpandedWidget> {
 
@@ -57,24 +57,20 @@ public class SocialItemExpandedWidget extends Composite {
 
     }
 
-    public void createFirstRow(
-            SocialItemExpandedWidgetModel model ) {
+    public void createFirstRow( SocialItemExpandedWidgetModel model ) {
         createIcon( model );
         createLink( model );
 
     }
 
     private void createIcon( final SocialItemExpandedWidgetModel model ) {
-
         UpdateItem updateItem = model.getUpdateItems().get( 0 );
         if ( updateItem.getEvent().isVFSLink() ) {
             MessageBuilder.createCall( new RemoteCallback<Path>() {
                 public void callback( Path path ) {
                     for ( ClientResourceType type : model.getModel().getResourceTypes() ) {
                         if ( type.accept( path ) ) {
-                            com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = (com.google.gwt.user.client.ui.Image) type.getIcon();
-                            Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
-                            icon.add( newImage );
+                            addIconImage( (Image) type.getIcon() );
                             break;
                         }
                     }
@@ -83,18 +79,21 @@ public class SocialItemExpandedWidget extends Composite {
 
         } else {
             //TODO, provide icons per event type.
-            com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = GENERIC_FILE_IMAGE;
-            Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
-            icon.add( newImage );
+            addIconImage( GENERIC_FILE_IMAGE );
         }
+    }
+
+    private void addIconImage( final Image image ) {
+        final ImageAnchor newImage = new ImageAnchor();
+        newImage.setUrl( image.getUrl() );
+        newImage.setAsMediaObject( true );
+        left.add( newImage );
     }
 
     private void createLink( final SocialItemExpandedWidgetModel model ) {
         final UpdateItem updateItem = model.getUpdateItems().get( 0 );
-        NavList list = new NavList();
-        NavLink link = new NavLink();
-        final String linkLabel = updateItem.getEvent().getLinkLabel();
-        link.setText( linkLabel );
+        final Anchor link = new Anchor();
+        link.setText( updateItem.getEvent().getLinkLabel() );
         link.addClickHandler( new ClickHandler() {
             @Override
             public void onClick( ClickEvent event ) {
@@ -104,22 +103,21 @@ public class SocialItemExpandedWidget extends Composite {
                         .withLinkParams( updateItem.getEvent().getLinkParams() ) );
             }
         } );
-        list.add( link );
-        file.add( list );
+        desc.add( link );
     }
 
     public void createSecondRow( final SocialItemExpandedWidgetModel model,
                                  final UpdateItem updateItem ) {
 
         MessageBuilder.createCall( new RemoteCallback<SocialUser>() {
-            public void callback( SocialUser socialUser ) {
-                CommentRowWidget row = GWT.create( CommentRowWidget.class );
+            public void callback( final SocialUser socialUser ) {
+                final CommentRowWidget row = GWT.create( CommentRowWidget.class );
                 updateItem.setSocialUser( socialUser );
                 updateItem.setUserClickCommand( model.getModel().getUserClickCommand() );
                 updateItem.setFollowUnfollowCommand( model.getModel().getFollowUnfollowCommand() );
                 updateItem.setLoggedUser( model.getModel().getSocialUser() );
                 row.init( updateItem );
-                table.add( row );
+                items.add( row );
             }
         }, SocialUserRepositoryAPI.class ).findSocialUser( updateItem.getEvent().getSocialUser().getUserName() );
 

@@ -1,42 +1,50 @@
 package org.kie.uberfire.social.activities.client.widgets.item;
 
-import com.github.gwtbootstrap.client.ui.Column;
-import com.github.gwtbootstrap.client.ui.Image;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.NavList;
-import com.github.gwtbootstrap.client.ui.Paragraph;
-import com.github.gwtbootstrap.client.ui.Thumbnail;
-import com.github.gwtbootstrap.client.ui.Thumbnails;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
-import org.kie.uberfire.social.activities.client.gravatar.GravatarBuilder;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.ImageAnchor;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.jboss.errai.ioc.client.container.IOC;
+import org.kie.uberfire.social.activities.client.user.SocialUserImageProvider;
 import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SimpleItemWidgetModel;
 import org.kie.uberfire.social.activities.client.widgets.utils.SocialDateFormatter;
 import org.kie.uberfire.social.activities.model.SocialUser;
+import org.kie.uberfire.social.activities.service.SocialUserImageRepositoryAPI.ImageSize;
 import org.uberfire.client.resources.UberfireResources;
 import org.uberfire.client.workbench.type.ClientResourceType;
 
 public class SimpleItemWidget extends Composite {
 
     @UiField
-    Column icon;
+    FlowPanel left;
 
     @UiField
-    Column link;
+    Heading heading;
 
     @UiField
-    Column desc;
+    Paragraph desc;
 
     private static MyUiBinder uiBinder = GWT.create( MyUiBinder.class );
 
-    private static final com.google.gwt.user.client.ui.Image GENERIC_FILE_IMAGE = new com.google.gwt.user.client.ui.Image( UberfireResources.INSTANCE.images().typeGenericFile() );
+    private static final Image GENERIC_FILE_IMAGE = new Image( UberfireResources.INSTANCE.images().typeGenericFile() );
 
+    private SocialUserImageProvider imageProvider;
+
+    public SimpleItemWidget() {
+        imageProvider = IOC.getBeanManager().lookupBean( SocialUserImageProvider.class ).getInstance();
+    }
 
     interface MyUiBinder extends UiBinder<Widget, SimpleItemWidget> {
 
@@ -49,46 +57,54 @@ public class SimpleItemWidget extends Composite {
         } else {
             createIcon( model );
         }
-        createColumnContent( model ) ;
+        createDescriptionContent( model );
+        createHeadingContent( model );
     }
 
-    private void createColumnContent( SimpleItemWidgetModel model ) {
+    private void createHeadingContent( final SimpleItemWidgetModel model ) {
+        heading.setText( model.getSocialUser().getName() );
+    }
+
+    private void createDescriptionContent( SimpleItemWidgetModel model ) {
         if ( model.getLinkText() != null ) {
-            link.add( createLink( model ) );
+            desc.add( createLink( model ) );
+            desc.add( createText( model ) );
         } else {
-            link.add( new Paragraph( model.getDescription() ) );
+            desc.setText( model.getDescription() );
         }
-        desc.add( createText( model ) );
     }
 
-    private Paragraph createText( SimpleItemWidgetModel model ) {
-        StringBuilder sb = new StringBuilder();
+    private Widget createText( SimpleItemWidgetModel model ) {
+        final StringBuilder sb = new StringBuilder( " " );
         sb.append( model.getItemDescription() );
         sb.append( SocialDateFormatter.format( model.getTimestamp() ) );
-        sb.append( " by " + model.getSocialUser().getUserName() );
-        return new Paragraph( sb.toString() );
+        return new Text( sb.toString() );
     }
 
     private void createIcon( final SimpleItemWidgetModel model ) {
         if ( model.isVFSLink() ) {
             for ( ClientResourceType type : model.getResourceTypes() ) {
                 if ( type.accept( model.getLinkPath() ) ) {
-                    com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = (com.google.gwt.user.client.ui.Image) type.getIcon();
-                    Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
-                    icon.add( newImage );
+                    addIconImage( (Image) type.getIcon() );
                     break;
                 }
             }
         } else {
-            com.google.gwt.user.client.ui.Image maybeAlreadyAttachedImage = GENERIC_FILE_IMAGE;
-            Image newImage = new Image( maybeAlreadyAttachedImage.getUrl(), maybeAlreadyAttachedImage.getOriginLeft(), maybeAlreadyAttachedImage.getOriginTop(), maybeAlreadyAttachedImage.getWidth(), maybeAlreadyAttachedImage.getHeight() );
-            icon.add( newImage );
+            final Image maybeAlreadyAttachedImage = GENERIC_FILE_IMAGE;
+            addIconImage( maybeAlreadyAttachedImage );
         }
     }
 
-    private NavList createLink( final SimpleItemWidgetModel model ) {
-        NavList list = new NavList();
-        NavLink link = new NavLink();
+    private void addIconImage( final Image image ) {
+        final ImageAnchor newImage = new ImageAnchor();
+        newImage.setUrl( image.getUrl() );
+        newImage.setPull( Pull.LEFT );
+        newImage.setAsMediaObject( true );
+        left.add( newImage );
+    }
+
+    private Widget createLink( final SimpleItemWidgetModel model ) {
+        final Anchor link = new Anchor();
         link.setText( model.getLinkText() );
         link.addClickHandler( new ClickHandler() {
             @Override
@@ -99,19 +115,12 @@ public class SimpleItemWidget extends Composite {
                         .withLinkParams( model.getLinkParams() ) );
             }
         } );
-        list.add( link );
-        return list;
+        return link;
     }
 
-    private void createThumbNail( SocialUser socialUser ) {
-        Thumbnails tumThumbnails = new Thumbnails();
-        Thumbnail t = new Thumbnail();
-        Image userImage;
-        userImage = GravatarBuilder.generate( socialUser, GravatarBuilder.SIZE.SMALL );
-        userImage.setSize( "30px", "30px" );
-        t.add( userImage );
-        tumThumbnails.add( t );
-        icon.add( tumThumbnails );
+    private void createThumbNail( final SocialUser socialUser ) {
+        final Image userImage = imageProvider.getImageForSocialUser( socialUser, ImageSize.SMALL );
+        addIconImage( userImage );
     }
 
 }

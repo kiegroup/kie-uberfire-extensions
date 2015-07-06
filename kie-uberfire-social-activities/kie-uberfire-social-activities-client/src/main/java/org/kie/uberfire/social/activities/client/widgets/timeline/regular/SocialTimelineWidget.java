@@ -3,13 +3,13 @@ package org.kie.uberfire.social.activities.client.widgets.timeline.regular;
 import java.util.List;
 import java.util.Map;
 
-import com.github.gwtbootstrap.client.ui.Container;
-import com.github.gwtbootstrap.client.ui.Paragraph;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.MediaList;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.uberfire.social.activities.client.widgets.item.SimpleItemWidget;
@@ -28,7 +28,7 @@ import org.uberfire.backend.vfs.VFSService;
 public class SocialTimelineWidget extends Composite {
 
     @UiField
-    Container itemsPanel;
+    MediaList itemsPanel;
 
     private SocialTimelineWidgetModel model;
 
@@ -43,7 +43,6 @@ public class SocialTimelineWidget extends Composite {
     }
 
     private void createRegularQuerySocialItemsWidget( final SocialTimelineWidgetModel model ) {
-
         MessageBuilder.createCall( new RemoteCallback<List<SocialActivitiesEvent>>() {
             public void callback( List<SocialActivitiesEvent> events ) {
 
@@ -60,7 +59,7 @@ public class SocialTimelineWidget extends Composite {
                                      final SocialTimelineWidgetModel model ) {
         for ( final SocialActivitiesEvent event : events ) {
             if ( event.hasLink() ) {
-                createSimpleWidgetWithLink( event );                 ;
+                createSimpleWidgetWithLink( event );
             } else {
                 createSimpleWidget( event );
             }
@@ -104,7 +103,7 @@ public class SocialTimelineWidget extends Composite {
     }
 
     private void addItemWidget( SimpleItemWidgetModel model ) {
-        SimpleItemWidget simple = GWT.create( SimpleItemWidget.class );
+        final SimpleItemWidget simple = GWT.create( SimpleItemWidget.class );
         simple.init( model );
         itemsPanel.add( simple );
     }
