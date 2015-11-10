@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialEventType;
 import org.kie.uberfire.social.activities.model.SocialUser;
+import org.kie.uberfire.social.activities.security.SocialSecurityConstraintsManager;
 import org.kie.uberfire.social.activities.server.SocialUserServicesExtendedBackEndImpl;
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
@@ -27,8 +28,8 @@ public class SocialTimelineCacheClusterPersistence extends SocialTimelineCachePe
                                                   final SocialUserPersistenceAPI socialUserPersistenceAPI,
                                                   final SocialClusterMessaging socialClusterMessaging,
                                                   final SocialUserServicesExtendedBackEndImpl userServicesBackend,
-                                                  final FileSystem fileSystem ) {
-
+                                                  final FileSystem fileSystem,
+                                                  final SocialSecurityConstraintsManager socialSecurityConstraintsManager ) {
         this.gson = gson;
         this.gsonCollectionType = gsonCollectionType;
         this.ioService = ioService;
@@ -37,6 +38,7 @@ public class SocialTimelineCacheClusterPersistence extends SocialTimelineCachePe
         this.socialClusterMessaging = socialClusterMessaging;
         this.userServicesBackend = userServicesBackend;
         this.fileSystem = fileSystem;
+        this.socialSecurityConstraintsManager = socialSecurityConstraintsManager;
     }
 
     @Override

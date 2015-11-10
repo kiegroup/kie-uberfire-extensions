@@ -1,19 +1,18 @@
 package org.kie.uberfire.social.activities.repository;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.kie.uberfire.social.activities.model.*;
+import org.kie.uberfire.social.activities.persistence.SocialTimelineCacheInstancePersistenceUnitTestWrapper;
+import org.kie.uberfire.social.activities.security.SocialSecurityConstraintsManager;
+import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
+
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.kie.uberfire.social.activities.model.DefaultTypes;
-import org.kie.uberfire.social.activities.model.PagedSocialQuery;
-import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
-import org.kie.uberfire.social.activities.model.SocialPaged;
-import org.kie.uberfire.social.activities.model.SocialUser;
-import org.kie.uberfire.social.activities.persistence.SocialTimelineCacheInstancePersistenceUnitTestWrapper;
-import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class SocialUserTimelinePagedRepositoryTest {
 
@@ -23,7 +22,14 @@ public class SocialUserTimelinePagedRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-        socialTimelinePersistenceFake = new SocialTimelineCacheInstancePersistenceUnitTestWrapper();
+        SocialSecurityConstraintsManager socialSecurityConstraintsManager = new SocialSecurityConstraintsManager(){
+            @Override
+            public List<SocialActivitiesEvent> applyConstraints( List<SocialActivitiesEvent> events ) {
+                return events;
+            }
+        };
+
+        socialTimelinePersistenceFake = new SocialTimelineCacheInstancePersistenceUnitTestWrapper( socialSecurityConstraintsManager );
         repository = new SocialUserTimelinePagedRepository() {
             @Override
             SocialTimelinePersistenceAPI getSocialTimelinePersistenceAPI() {
@@ -189,13 +195,13 @@ public class SocialUserTimelinePagedRepositoryTest {
                                     List<SocialActivitiesEvent> events ) {
         SocialActivitiesEvent event = events.get( index );
         assertEquals( fileName, event.getSocialUser().getUserName() );
-        assertEquals( expected, event.getAdditionalInfo()[ 0 ] );
+        assertEquals( expected, event.getAdditionalInfo()[0] );
     }
 
     private void assertFreshEvents( PagedSocialQuery query ) {
-        assertEquals( "2", query.socialEvents().get( 0 ).getAdditionalInfo()[ 0 ] );
-        assertEquals( "1", query.socialEvents().get( 1 ).getAdditionalInfo()[ 0 ] );
-        assertEquals( "0", query.socialEvents().get( 2 ).getAdditionalInfo()[ 0 ] );
+        assertEquals( "2", query.socialEvents().get( 0 ).getAdditionalInfo()[0] );
+        assertEquals( "1", query.socialEvents().get( 1 ).getAdditionalInfo()[0] );
+        assertEquals( "0", query.socialEvents().get( 2 ).getAdditionalInfo()[0] );
     }
 
     @Test
@@ -205,13 +211,13 @@ public class SocialUserTimelinePagedRepositoryTest {
 
         SocialPaged socialPaged = new SocialPaged( 1 );
         PagedSocialQuery query = repository.getUserTimeline( socialUser, socialPaged );
-        assertEquals( "2", query.socialEvents().get( 0 ).getAdditionalInfo()[ 0 ] );
+        assertEquals( "2", query.socialEvents().get( 0 ).getAdditionalInfo()[0] );
 
         query = repository.getUserTimeline( socialUser, socialPaged );
-        assertEquals( "1", query.socialEvents().get( 0 ).getAdditionalInfo()[ 0 ] );
+        assertEquals( "1", query.socialEvents().get( 0 ).getAdditionalInfo()[0] );
 
         query = repository.getUserTimeline( socialUser, socialPaged );
-        assertEquals( "0", query.socialEvents().get( 0 ).getAdditionalInfo()[ 0 ] );
+        assertEquals( "0", query.socialEvents().get( 0 ).getAdditionalInfo()[0] );
 
     }
 
@@ -259,7 +265,7 @@ public class SocialUserTimelinePagedRepositoryTest {
 
     private void createFreshCacheEventsEvents( int numberOfEvents ) {
         for ( int i = 0; i < numberOfEvents; i++ ) {
-            socialTimelinePersistenceFake.persist( socialUser, new SocialActivitiesEvent( new SocialUser( "fresh" ), DefaultTypes.DUMMY_EVENT, new Date()).withAdicionalInfo(  i + "" ) );
+            socialTimelinePersistenceFake.persist( socialUser, new SocialActivitiesEvent( new SocialUser( "fresh" ), DefaultTypes.DUMMY_EVENT, new Date() ).withAdicionalInfo( i + "" ) );
         }
     }
 }
