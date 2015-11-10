@@ -1,32 +1,38 @@
 package org.kie.uberfire.social.activities.repository;
 
-import java.util.Date;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.uberfire.social.activities.model.DefaultTypes;
-import org.kie.uberfire.social.activities.model.PagedSocialQuery;
-import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
-import org.kie.uberfire.social.activities.model.SocialEventType;
-import org.kie.uberfire.social.activities.model.SocialPaged;
-import org.kie.uberfire.social.activities.model.SocialUser;
+import org.kie.uberfire.social.activities.model.*;
 import org.kie.uberfire.social.activities.persistence.SocialTimelineCacheInstancePersistenceUnitTestWrapper;
+import org.kie.uberfire.social.activities.security.SocialSecurityConstraintsManager;
 import org.kie.uberfire.social.activities.service.SocialAdapter;
 import org.kie.uberfire.social.activities.service.SocialCommandTypeFilter;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 
-import static org.junit.Assert.*;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class SocialTypeTimelinePagedRepositoryTest {
 
     private SocialTypeTimelinePagedRepository repository;
     private SocialEventType type = DefaultTypes.DUMMY_EVENT;
     private SocialTimelinePersistenceAPI socialTimelinePersistenceFake;
+    private SocialSecurityConstraintsManager socialSecurityConstraintsManagerSpy;
 
     @Before
     public void setUp() throws Exception {
-        socialTimelinePersistenceFake = new SocialTimelineCacheInstancePersistenceUnitTestWrapper();
+        SocialSecurityConstraintsManager socialSecurityConstraintsManager = new SocialSecurityConstraintsManager() {
+            @Override
+            public List<SocialActivitiesEvent> applyConstraints( List<SocialActivitiesEvent> events ) {
+                return events;
+            }
+        };
+        socialSecurityConstraintsManagerSpy = spy( socialSecurityConstraintsManager );
+        socialTimelinePersistenceFake = new SocialTimelineCacheInstancePersistenceUnitTestWrapper( socialSecurityConstraintsManagerSpy );
         repository = new SocialTypeTimelinePagedRepository() {
 
             @Override
@@ -127,6 +133,8 @@ public class SocialTypeTimelinePagedRepositoryTest {
         assertTrue( query.socialEvents().size() == 3 );
         assertTrue( !socialPaged.canIGoForward() );
 
+        verify( socialSecurityConstraintsManagerSpy ).applyConstraints( any( List.class ) );
+
     }
 
     private void assertStoredEvent( String fileName,
@@ -135,13 +143,13 @@ public class SocialTypeTimelinePagedRepositoryTest {
                                     List<SocialActivitiesEvent> events ) {
         SocialActivitiesEvent event = events.get( index );
         assertEquals( fileName, event.getSocialUser().getUserName() );
-        assertEquals( expected, event.getAdditionalInfo()[ 0 ] );
+        assertEquals( expected, event.getAdditionalInfo()[0] );
     }
 
     private void assertFreshEvents( PagedSocialQuery query ) {
-        assertEquals( "2", query.socialEvents().get( 0 ).getAdditionalInfo()[ 0 ] );
-        assertEquals( "1", query.socialEvents().get( 1 ).getAdditionalInfo()[ 0 ] );
-        assertEquals( "0", query.socialEvents().get( 2 ).getAdditionalInfo()[ 0 ] );
+        assertEquals( "2", query.socialEvents().get( 0 ).getAdditionalInfo()[0] );
+        assertEquals( "1", query.socialEvents().get( 1 ).getAdditionalInfo()[0] );
+        assertEquals( "0", query.socialEvents().get( 2 ).getAdditionalInfo()[0] );
     }
 
     private PagedSocialQuery queryAndAssertNumberOfEvents( int numberOfEvents,

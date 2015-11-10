@@ -31,6 +31,7 @@ import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.persistence.SocialClusterMessaging;
 import org.kie.uberfire.social.activities.persistence.SocialTimelineCacheClusterPersistence;
 import org.kie.uberfire.social.activities.persistence.SocialTimelineCacheInstancePersistence;
+import org.kie.uberfire.social.activities.security.SocialSecurityConstraintsManager;
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
@@ -74,13 +75,16 @@ public class SocialTimelinePersistenceProducer {
     @Inject
     private SocialUserPersistenceAPI socialUserPersistenceAPI;
 
+    @Inject
+    SocialSecurityConstraintsManager socialSecurityConstraintsManager;
+
     @PostConstruct
     public void setup() {
         gsonFactory();
         if ( clusterServiceFactory == null ) {
-            socialTimelinePersistenceAPI = new SocialTimelineCacheInstancePersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, userServicesBackend, fileSystem );
+            socialTimelinePersistenceAPI = new SocialTimelineCacheInstancePersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, userServicesBackend, fileSystem, socialSecurityConstraintsManager );
         } else {
-            socialTimelinePersistenceAPI = new SocialTimelineCacheClusterPersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, socialClusterMessaging, userServicesBackend, fileSystem );
+            socialTimelinePersistenceAPI = new SocialTimelineCacheClusterPersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, socialClusterMessaging, userServicesBackend, fileSystem, socialSecurityConstraintsManager );
         }
         socialTimelinePersistenceAPI.setup();
     }
