@@ -26,20 +26,26 @@ import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialEventType;
 import org.kie.uberfire.social.activities.model.SocialUser;
 import org.kie.uberfire.social.activities.repository.SocialEventTypeRepository;
+import org.kie.uberfire.social.activities.security.SocialSecurityConstraintsManager;
 import org.uberfire.io.IOService;
 
 public class SocialTimelineCacheInstancePersistenceUnitTestWrapper extends SocialTimelineCacheInstancePersistence {
 
     public SocialTimelineCacheInstancePersistenceUnitTestWrapper() {
-        super( null, null, null, null, null, null, null );
+        super( null, null, null, null, null, null, null, null );
     }
+
+    public SocialTimelineCacheInstancePersistenceUnitTestWrapper(SocialSecurityConstraintsManager socialSecurityConstraintsManager) {
+        super( null, null, null, null, null, null, null, socialSecurityConstraintsManager );
+    }
+
 
     public SocialTimelineCacheInstancePersistenceUnitTestWrapper( Gson gson,
                                                                   Type gsonCollectionType,
                                                                   IOService ioService,
                                                                   SocialEventTypeRepository socialEventTypeRepository,
                                                                   SocialUserClusterPersistence socialUserService ) {
-        super( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserService, null, null );
+        super( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserService, null, null, null );
     }
 
     @Override
