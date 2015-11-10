@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialEventType;
 import org.kie.uberfire.social.activities.model.SocialUser;
+import org.kie.uberfire.social.activities.security.SocialSecurityConstraintsManager;
 import org.kie.uberfire.social.activities.server.SocialUserServicesExtendedBackEndImpl;
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
@@ -44,6 +45,9 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     SocialUserPersistenceAPI socialUserPersistenceAPI;
 
     SocialUserServicesExtendedBackEndImpl userServicesBackend;
+
+    SocialSecurityConstraintsManager socialSecurityConstraintsManager;
+
 
     @Override
     public void setup() {
@@ -84,20 +88,24 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
             } else {
                 createPersistenceStructure( timelineDir );
             }
-            return events;
+            return applySocialSecurityConstraints( events );
         } catch ( Exception e ) {
             throw new ErrorAccessingTimeline( e );
         }
     }
 
-    private List<SocialActivitiesEvent> getTimeline( Path timelineDir,
+    List<SocialActivitiesEvent> getTimeline( Path timelineDir,
                                                      String fileIndex ) {
         List<SocialActivitiesEvent> events;
         Path fileTimeline = timelineDir.resolve( fileIndex );
         String numberOfEvents = getItemsMetadata( timelineDir, fileIndex );
-        SocialFile socialFile = new SocialFile( fileTimeline, ioService, gson );
+        SocialFile socialFile = createSocialFile( fileTimeline );
         events = socialFile.readSocialEvents( Integer.valueOf( numberOfEvents ) );
-        return events;
+        return applySocialSecurityConstraints( events );
+    }
+
+    SocialFile createSocialFile( Path fileTimeline ) {
+        return new SocialFile( fileTimeline, ioService, gson );
     }
 
     private boolean thereIsSomethingToRead( Integer lastFileIndex ) {
@@ -115,7 +123,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         return lastIndex;
     }
 
-    private void createPersistenceStructure( Path timelineDir ) {
+    void createPersistenceStructure( Path timelineDir ) {
         String lastIndex = "-1";
         updateLastIndexFile( timelineDir, lastIndex );
     }
@@ -160,7 +168,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         }
     }
 
-    private String getItemsMetadata( Path timeLineDir,
+    String getItemsMetadata( Path timeLineDir,
                                      String originalFilename ) {
         String metadataFileName = originalFilename + Constants.METADATA;
         Path timelineFile = timeLineDir.resolve( metadataFileName );
@@ -231,9 +239,8 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     }
 
     enum Constants {
-        LAST_FILE_INDEX, USER_TIMELINE, METADATA
+        LAST_FILE_INDEX, USER_TIMELINE, METADATA;
     }
-
     //TYPE STUFF
 
     List<SocialActivitiesEvent> createOrGetTypeTimeline( SocialEventType type ) {
@@ -243,10 +250,10 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
 
     @Override
     public List<SocialActivitiesEvent> getLastEvents( SocialEventType key ) {
-        List<SocialActivitiesEvent> socialActivitiesEvents = new ArrayList<SocialActivitiesEvent>();
-        socialActivitiesEvents.addAll( typeEventsTimelineCache.get( key ) );
-        socialActivitiesEvents.addAll( typeEventsFreshEvents.get( key ) );
-        return socialActivitiesEvents;
+        List<SocialActivitiesEvent> events = new ArrayList<SocialActivitiesEvent>();
+        events.addAll( typeEventsTimelineCache.get( key ) );
+        events.addAll( typeEventsFreshEvents.get( key ) );
+        return applySocialSecurityConstraints( events );
     }
 
     List<SocialActivitiesEvent> storeTimeLineInFile( SocialEventType type ) {
@@ -278,12 +285,12 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
 
     @Override
     public List<SocialActivitiesEvent> getRecentEvents( SocialEventType type ) {
-        List<SocialActivitiesEvent> socialActivitiesEvents = new ArrayList<SocialActivitiesEvent>();
+        List<SocialActivitiesEvent> events = new ArrayList<SocialActivitiesEvent>();
         List<SocialActivitiesEvent> typeEvents = typeEventsFreshEvents.get( type );
         if ( typeEvents != null ) {
-            socialActivitiesEvents.addAll( typeEvents );
+            events.addAll( typeEvents );
         }
-        return socialActivitiesEvents;
+        return applySocialSecurityConstraints( events );
     }
 
     @Override
@@ -306,7 +313,6 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     Map<String, List<SocialActivitiesEvent>> userEventsTimelineCache = new HashMap<String, List<SocialActivitiesEvent>>();
     Map<String, List<SocialActivitiesEvent>> userEventsTimelineFreshEvents = new HashMap<String, List<SocialActivitiesEvent>>();
     Map<String, SocialCacheControl> userEventsCacheControl = new HashMap<String, SocialCacheControl>();
-
     List<SocialActivitiesEvent> createOrGetUserTimeline( String userName ) {
         return createOrGetTimeline( getRootUserTimelineDirectory().resolve( userName ) );
     }
@@ -335,7 +341,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
         }
         socialActivitiesEvents.addAll( userEventsTimelineCache.get( user.getUserName() ) );
         socialActivitiesEvents.addAll( userEventsTimelineFreshEvents.get( user.getUserName() ) );
-        return socialActivitiesEvents;
+        return applySocialSecurityConstraints( socialActivitiesEvents );
     }
 
     @Override
@@ -346,7 +352,7 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
             createCacheStructureForNewUsers( user );
         }
         socialActivitiesEvents.addAll( userEventsTimelineFreshEvents.get( user.getUserName() ) );
-        return socialActivitiesEvents;
+        return applySocialSecurityConstraints( socialActivitiesEvents );
     }
 
     private void createCacheStructureForNewUsers( SocialUser user ) {
@@ -437,5 +443,9 @@ public abstract class SocialTimelineCachePersistence implements SocialTimelinePe
     @Override
     public void dispose() {
         saveAllEvents();
+    }
+
+    private List<SocialActivitiesEvent> applySocialSecurityConstraints( List<SocialActivitiesEvent> events ) {
+        return socialSecurityConstraintsManager.applyConstraints(events);
     }
 }
