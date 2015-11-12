@@ -26,6 +26,7 @@ import org.kie.uberfire.social.activities.model.SocialUser;
 import org.kie.uberfire.social.activities.server.SocialUserServicesExtendedBackEndImpl;
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
+import org.uberfire.commons.lifecycle.PriorityDisposableRegistry;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.FileSystem;
 
@@ -46,6 +47,7 @@ public class SocialTimelineCacheInstancePersistence extends SocialTimelineCacheP
         this.socialUserPersistenceAPI = socialUserService;
         this.userServicesBackend = userServicesBackend;
         this.fileSystem = fileSystem;
+        PriorityDisposableRegistry.register( this );
     }
 
     @Override

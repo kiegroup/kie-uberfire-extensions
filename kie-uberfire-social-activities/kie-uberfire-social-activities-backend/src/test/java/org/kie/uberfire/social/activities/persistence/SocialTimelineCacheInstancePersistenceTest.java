@@ -17,6 +17,7 @@ package org.kie.uberfire.social.activities.persistence;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.uberfire.commons.lifecycle.PriorityDisposableRegistry;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +30,9 @@ public class SocialTimelineCacheInstancePersistenceTest {
     public void setup() {
         //default
         threshold = 100;
-        cacheControl = new SocialTimelineCacheInstancePersistenceUnitTestWrapper(  ).new SocialCacheControl();
+        final SocialTimelineCacheInstancePersistence cacheInstancePersistence = new SocialTimelineCacheInstancePersistenceUnitTestWrapper(  );
+        cacheControl = cacheInstancePersistence.new SocialCacheControl();
+        assertTrue( PriorityDisposableRegistry.getDisposables().contains( cacheInstancePersistence ) );
     }
 
     @Test

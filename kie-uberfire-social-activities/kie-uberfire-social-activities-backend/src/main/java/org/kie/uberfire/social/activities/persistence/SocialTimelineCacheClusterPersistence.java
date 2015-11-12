@@ -27,6 +27,7 @@ import org.kie.uberfire.social.activities.server.SocialUserServicesExtendedBackE
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
+import org.uberfire.commons.lifecycle.PriorityDisposableRegistry;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
@@ -52,6 +53,7 @@ public class SocialTimelineCacheClusterPersistence extends SocialTimelineCachePe
         this.socialClusterMessaging = socialClusterMessaging;
         this.userServicesBackend = userServicesBackend;
         this.fileSystem = fileSystem;
+        PriorityDisposableRegistry.register( this );
     }
 
     @Override
