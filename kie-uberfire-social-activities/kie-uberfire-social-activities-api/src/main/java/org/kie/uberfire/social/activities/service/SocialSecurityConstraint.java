@@ -17,6 +17,15 @@ package org.kie.uberfire.social.activities.service;
 
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 
+/**
+ * This interface defines a SocialSecurityConstraint.
+ * Each implementation of this class will be applied by
+ * SocialSecurityConstraintsManager each time
+ * that a social timeline is requested.
+ * Be advised that these constraints are not always applied
+ * in CDI RequestScoped, so pay attention when you want to use a
+ * RequestScoped bean in this implementation (like User interface).
+ */
 public interface SocialSecurityConstraint {
 
     boolean hasRestrictions( SocialActivitiesEvent event );
