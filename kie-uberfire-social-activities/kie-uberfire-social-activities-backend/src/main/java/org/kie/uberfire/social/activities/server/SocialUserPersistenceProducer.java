@@ -34,10 +34,12 @@ import org.kie.uberfire.social.activities.persistence.SocialUserInstancePersiste
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
 import org.uberfire.backend.server.UserServicesImpl;
+import org.uberfire.backend.server.io.ConfigIOServiceProducer;
 import org.uberfire.commons.cluster.ClusterServiceFactory;
 import org.uberfire.commons.services.cdi.Startup;
 import org.uberfire.commons.services.cdi.StartupType;
 import org.uberfire.io.IOService;
+import org.uberfire.java.nio.file.FileSystem;
 
 @ApplicationScoped
 @Startup(StartupType.BOOTSTRAP)
@@ -51,15 +53,22 @@ public class SocialUserPersistenceProducer {
 
     private Type gsonCollectionType;
 
+    //please do not remove, for the absurd it may sound, this is needed
+    //to guarantee the bean initializion order. if removed, doesn't work
+    //on WAS. https://bugzilla.redhat.com/show_bug.cgi?id=1266138
     @Inject
     @Named("configIO")
     private IOService ioService;
 
+    //please do not remove, for the absurd it may sound, this is needed
+    //to guarantee the bean initializion order. if removed, doesn't work
+    //on WAS. https://bugzilla.redhat.com/show_bug.cgi?id=1266138
     @Inject
-    private SocialEventTypeRepositoryAPI socialEventTypeRepository;
+    @Named("systemFS")
+    private FileSystem fileSystem;
 
     @Inject
-    private SocialUserServicesExtendedBackEndImpl userServicesBackend;
+    private SocialEventTypeRepositoryAPI socialEventTypeRepository;
 
     @Inject
     private UserServicesImpl userServices;
@@ -72,10 +81,13 @@ public class SocialUserPersistenceProducer {
     @PostConstruct
     public void setup() {
         gsonFactory();
+        final IOService _ioService = ConfigIOServiceProducer.getInstance().configIOService();
+        final SocialUserServicesExtendedBackEndImpl userServicesBackend = new SocialUserServicesExtendedBackEndImpl( fileSystem );
+
         if ( clusterServiceFactory == null ) {
-            socialUserPersistenceAPI = new SocialUserInstancePersistence( userServicesBackend, userServices, ioService, gson );
+            socialUserPersistenceAPI = new SocialUserInstancePersistence( userServicesBackend, userServices, _ioService, gson );
         } else {
-            socialUserPersistenceAPI = new SocialUserClusterPersistence( userServicesBackend, userServices, ioService, gson, socialUserClusterMessaging );
+            socialUserPersistenceAPI = new SocialUserClusterPersistence( userServicesBackend, userServices, _ioService, gson, socialUserClusterMessaging );
         }
         socialUserPersistenceAPI.setup();
     }

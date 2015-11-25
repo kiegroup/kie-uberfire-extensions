@@ -18,24 +18,29 @@ package org.kie.uberfire.social.activities.server;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.uberfire.backend.server.io.ConfigIOServiceProducer;
 import org.uberfire.java.nio.base.AbstractPath;
 import org.uberfire.java.nio.file.FileSystem;
 import org.uberfire.java.nio.file.Path;
 
-@ApplicationScoped
+//this type can't be managed bean, otherwise WAS will fail
+//https://bugzilla.redhat.com/show_bug.cgi?id=1266138
 public class SocialUserServicesExtendedBackEndImpl {
 
-    @Inject
-    @Named("systemFS")
     private FileSystem fileSystem;
 
+    public SocialUserServicesExtendedBackEndImpl( final FileSystem fileSystem ) {
+        this.fileSystem = fileSystem;
+    }
+
     public List<String> getAllBranches() {
-        List<String> branches = new ArrayList<String>();
-        for ( Iterator it = fileSystem.getRootDirectories().iterator(); it.hasNext(); ) {
+        final List<String> branches = new ArrayList<String>();
+        FileSystem _fileSystem = ConfigIOServiceProducer.getInstance().configFileSystem();
+        if ( _fileSystem == null ) {
+            _fileSystem = fileSystem;
+        }
+        for ( Iterator it = _fileSystem.getRootDirectories().iterator(); it.hasNext(); ) {
             AbstractPath path = (AbstractPath) it.next();
             branches.add( path.getHost() );
         }
@@ -44,10 +49,14 @@ public class SocialUserServicesExtendedBackEndImpl {
 
     public Path buildPath( final String serviceType,
                            final String relativePath ) {
+        FileSystem _fileSystem = ConfigIOServiceProducer.getInstance().configFileSystem();
+        if ( _fileSystem == null ) {
+            _fileSystem = fileSystem;
+        }
         if ( relativePath != null && !"".equals( relativePath ) ) {
-            return fileSystem.getPath( "social", serviceType, relativePath );
+            return _fileSystem.getPath( "social", serviceType, relativePath );
         } else {
-            return fileSystem.getPath( "social", serviceType );
+            return _fileSystem.getPath( "social", serviceType );
         }
     }
 }
