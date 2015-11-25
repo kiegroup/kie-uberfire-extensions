@@ -35,6 +35,7 @@ import org.kie.uberfire.social.activities.security.SocialSecurityConstraintsMana
 import org.kie.uberfire.social.activities.service.SocialEventTypeRepositoryAPI;
 import org.kie.uberfire.social.activities.service.SocialTimelinePersistenceAPI;
 import org.kie.uberfire.social.activities.service.SocialUserPersistenceAPI;
+import org.uberfire.backend.server.io.ConfigIOServiceProducer;
 import org.uberfire.commons.cluster.ClusterServiceFactory;
 import org.uberfire.commons.services.cdi.Startup;
 import org.uberfire.commons.services.cdi.StartupType;
@@ -55,10 +56,16 @@ public class SocialTimelinePersistenceProducer {
 
     private Type gsonCollectionType;
 
+    //please do not remove, for the absurd it may sound, this is needed
+    //to guarantee the bean initializion order. if removed, doesn't work
+    //on WAS. https://bugzilla.redhat.com/show_bug.cgi?id=1266138
     @Inject
     @Named("configIO")
     private IOService ioService;
 
+    //please do not remove, for the absurd it may sound, this is needed
+    //to guarantee the bean initializion order. if removed, doesn't work
+    //on WAS. https://bugzilla.redhat.com/show_bug.cgi?id=1266138
     @Inject
     @Named("systemFS")
     private FileSystem fileSystem;
@@ -70,9 +77,6 @@ public class SocialTimelinePersistenceProducer {
     private SocialClusterMessaging socialClusterMessaging;
 
     @Inject
-    private SocialUserServicesExtendedBackEndImpl userServicesBackend;
-
-    @Inject
     private SocialUserPersistenceAPI socialUserPersistenceAPI;
 
     @Inject
@@ -81,10 +85,14 @@ public class SocialTimelinePersistenceProducer {
     @PostConstruct
     public void setup() {
         gsonFactory();
+        final IOService _ioService = ConfigIOServiceProducer.getInstance().configIOService();
+        final FileSystem _fileSystem = ConfigIOServiceProducer.getInstance().configFileSystem();
+        final SocialUserServicesExtendedBackEndImpl userServicesBackend = new SocialUserServicesExtendedBackEndImpl( fileSystem );
+
         if ( clusterServiceFactory == null ) {
-            socialTimelinePersistenceAPI = new SocialTimelineCacheInstancePersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, userServicesBackend, fileSystem, socialSecurityConstraintsManager );
+            socialTimelinePersistenceAPI = new SocialTimelineCacheInstancePersistence( gson, gsonCollectionType, _ioService, socialEventTypeRepository, socialUserPersistenceAPI, userServicesBackend, _fileSystem, socialSecurityConstraintsManager );
         } else {
-            socialTimelinePersistenceAPI = new SocialTimelineCacheClusterPersistence( gson, gsonCollectionType, ioService, socialEventTypeRepository, socialUserPersistenceAPI, socialClusterMessaging, userServicesBackend, fileSystem, socialSecurityConstraintsManager );
+            socialTimelinePersistenceAPI = new SocialTimelineCacheClusterPersistence( gson, gsonCollectionType, _ioService, socialEventTypeRepository, socialUserPersistenceAPI, socialClusterMessaging, userServicesBackend, _fileSystem, socialSecurityConstraintsManager );
         }
         socialTimelinePersistenceAPI.setup();
     }
