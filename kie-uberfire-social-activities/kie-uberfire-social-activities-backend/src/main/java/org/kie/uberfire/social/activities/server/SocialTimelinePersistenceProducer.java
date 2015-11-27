@@ -85,10 +85,20 @@ public class SocialTimelinePersistenceProducer {
     @PostConstruct
     public void setup() {
         gsonFactory();
-        final IOService _ioService = ConfigIOServiceProducer.getInstance().configIOService();
-        final FileSystem _fileSystem = ConfigIOServiceProducer.getInstance().configFileSystem();
+        final IOService _ioService = getConfigIOServiceProducer().configIOService();
+        final FileSystem _fileSystem = getConfigIOServiceProducer().configFileSystem();
         final SocialUserServicesExtendedBackEndImpl userServicesBackend = new SocialUserServicesExtendedBackEndImpl( fileSystem );
 
+        setupSocialTimelinePersistenceAPI( _ioService, _fileSystem, userServicesBackend );
+
+    }
+
+    ConfigIOServiceProducer getConfigIOServiceProducer() {
+        return ConfigIOServiceProducer.getInstance();
+    }
+
+    void setupSocialTimelinePersistenceAPI( IOService _ioService, FileSystem _fileSystem,
+                                                    SocialUserServicesExtendedBackEndImpl userServicesBackend ) {
         if ( clusterServiceFactory == null ) {
             socialTimelinePersistenceAPI = new SocialTimelineCacheInstancePersistence( gson, gsonCollectionType, _ioService, socialEventTypeRepository, socialUserPersistenceAPI, userServicesBackend, _fileSystem, socialSecurityConstraintsManager );
         } else {

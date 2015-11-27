@@ -81,15 +81,24 @@ public class SocialUserPersistenceProducer {
     @PostConstruct
     public void setup() {
         gsonFactory();
-        final IOService _ioService = ConfigIOServiceProducer.getInstance().configIOService();
+        final IOService _ioService = getConfigIOServiceProducer().configIOService();
         final SocialUserServicesExtendedBackEndImpl userServicesBackend = new SocialUserServicesExtendedBackEndImpl( fileSystem );
 
+        setupSocialUserPersistenceAPI( _ioService, userServicesBackend );
+    }
+
+    void setupSocialUserPersistenceAPI( IOService _ioService,
+                                                SocialUserServicesExtendedBackEndImpl userServicesBackend ) {
         if ( clusterServiceFactory == null ) {
             socialUserPersistenceAPI = new SocialUserInstancePersistence( userServicesBackend, userServices, _ioService, gson );
         } else {
             socialUserPersistenceAPI = new SocialUserClusterPersistence( userServicesBackend, userServices, _ioService, gson, socialUserClusterMessaging );
         }
         socialUserPersistenceAPI.setup();
+    }
+
+    ConfigIOServiceProducer getConfigIOServiceProducer() {
+        return ConfigIOServiceProducer.getInstance();
     }
 
     @Produces
