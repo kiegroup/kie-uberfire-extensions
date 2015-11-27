@@ -35,11 +35,8 @@ public class SocialUserServicesExtendedBackEndImpl {
     }
 
     public List<String> getAllBranches() {
+        FileSystem _fileSystem = getFileSystem();
         final List<String> branches = new ArrayList<String>();
-        FileSystem _fileSystem = ConfigIOServiceProducer.getInstance().configFileSystem();
-        if ( _fileSystem == null ) {
-            _fileSystem = fileSystem;
-        }
         for ( Iterator it = _fileSystem.getRootDirectories().iterator(); it.hasNext(); ) {
             AbstractPath path = (AbstractPath) it.next();
             branches.add( path.getHost() );
@@ -49,14 +46,23 @@ public class SocialUserServicesExtendedBackEndImpl {
 
     public Path buildPath( final String serviceType,
                            final String relativePath ) {
-        FileSystem _fileSystem = ConfigIOServiceProducer.getInstance().configFileSystem();
-        if ( _fileSystem == null ) {
-            _fileSystem = fileSystem;
-        }
+        FileSystem _fileSystem = getFileSystem();
         if ( relativePath != null && !"".equals( relativePath ) ) {
             return _fileSystem.getPath( "social", serviceType, relativePath );
         } else {
             return _fileSystem.getPath( "social", serviceType );
         }
+    }
+
+    FileSystem getFileSystem() {
+        FileSystem _fileSystem = getConfigIOServiceProducer().configFileSystem();
+        if ( _fileSystem == null ) {
+            _fileSystem = fileSystem;
+        }
+        return _fileSystem;
+    }
+
+    ConfigIOServiceProducer getConfigIOServiceProducer() {
+        return ConfigIOServiceProducer.getInstance();
     }
 }
