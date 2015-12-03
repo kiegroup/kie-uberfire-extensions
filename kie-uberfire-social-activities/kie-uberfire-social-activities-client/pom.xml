@@ -14,18 +14,6 @@
   <name>KIE Uberfire Social Activities Client</name>
   <description>KIE Uberfire Social Activities Client</description>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-parent-with-dependencies</artifactId>
-        <type>pom</type>
-        <version>${version.org.uberfire}</version>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- Project Dependencies -->
 
