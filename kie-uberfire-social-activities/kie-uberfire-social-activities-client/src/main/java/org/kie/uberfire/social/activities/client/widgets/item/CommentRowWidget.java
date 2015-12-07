@@ -16,6 +16,8 @@
 package org.kie.uberfire.social.activities.client.widgets.item;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -56,7 +58,11 @@ public class CommentRowWidget extends Composite {
     }
 
     public CommentRowWidget() {
-        imageProvider = IOC.getBeanManager().lookupBean( SocialUserImageProvider.class ).getInstance();
+        imageProvider = getSocialUserImageProvider();
+    }
+
+    SocialUserImageProvider getSocialUserImageProvider() {
+        return IOC.getBeanManager().lookupBean( SocialUserImageProvider.class ).getInstance();
     }
 
     public void init( UpdateItem model ) {
@@ -86,12 +92,18 @@ public class CommentRowWidget extends Composite {
         desc.add( new Text( comment.toString() ) );
     }
 
-    private void createThumbNail( UpdateItem updateItem ) {
+    void createThumbNail( final UpdateItem updateItem ) {
         final SocialUser socialUser = updateItem.getEvent().getSocialUser();
         final Image userImage = imageProvider.getImageForSocialUser( socialUser, ImageSize.SMALL );
-        final ImageAnchor newImage = new ImageAnchor();
+        final ImageAnchor newImage = GWT.create( ImageAnchor.class );
         newImage.setUrl( userImage.getUrl() );
         newImage.setAsMediaObject( true );
+        newImage.addClickHandler( new ClickHandler() {
+            @Override
+            public void onClick( ClickEvent clickEvent ) {
+                updateItem.getUserClickCommand().execute( socialUser.getUserName() );
+            }
+        } );
         left.add( newImage );
     }
 
