@@ -17,6 +17,5 @@
     <module>kie-uberfire-social-activities-api</module>
     <module>kie-uberfire-social-activities-backend</module>
     <module>kie-uberfire-social-activities-client</module>
-    <module>kie-uberfire-social-activities-showcase</module>
   </modules>
 </project>
