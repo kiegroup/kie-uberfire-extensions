@@ -45,7 +45,7 @@ public class SocialRouter {
             String newPath = path.substring( 1 );
             return newPath;
         }
-        throw new NotASocialPathException();
+        throw new NotASocialPathException("Path " + path + " is not valid in this context.");
     }
 
     private boolean isSlashFirstChar( String path ) {
@@ -86,5 +86,11 @@ public class SocialRouter {
 
     private class NotASocialPathException extends RuntimeException {
 
+        public NotASocialPathException() {
+        }
+
+        public NotASocialPathException(String message) {
+            super(message);
+        }
     }
 }

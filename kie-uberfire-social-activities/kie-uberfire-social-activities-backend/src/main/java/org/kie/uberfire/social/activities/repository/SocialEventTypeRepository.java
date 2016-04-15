@@ -75,10 +75,17 @@ public class SocialEventTypeRepository implements SocialEventTypeRepositoryAPI {
                 return type;
             }
         }
-       throw new TypeNotFoundException();
+       throw new TypeNotFoundException("Social event of type " + typeName + " could not be found.");
     }
 
-    private class TypeNotFoundException extends RuntimeException{
+    private class TypeNotFoundException extends RuntimeException {
+
+        public TypeNotFoundException() {
+        }
+
+        public TypeNotFoundException(String message) {
+            super(message);
+        }
 
     }
 }
