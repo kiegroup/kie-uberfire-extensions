@@ -27,6 +27,7 @@ import org.gwtbootstrap3.client.ui.MediaList;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
+import org.kie.uberfire.social.activities.client.resources.i18n.SocialConstants;
 import org.kie.uberfire.social.activities.client.widgets.item.SimpleItemWidget;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SimpleItemWidgetModel;
 import org.kie.uberfire.social.activities.client.widgets.pagination.Pager;
@@ -95,7 +96,7 @@ public class SimpleSocialTimelineWidget extends Composite {
     }
 
     private void displayNoEvents() {
-        pagination.add( new Paragraph( "There are no social events...yet!" ) );
+        pagination.add(new Paragraph(SocialConstants.INSTANCE.NoSocialEvents()));
     }
 
     private boolean thereIsNoEvents( PagedSocialQuery paged ) {
