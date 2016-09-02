@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.kie.uberfire.social.activities.client.resources.i18n.SocialConstants;
 
 /**
  * PatternFly pager next link style
@@ -19,7 +20,7 @@ public class Next extends ListItem {
         nextIcon.addStyleName( "i" );
         nextIcon.addStyleName( "fa" );
         nextIcon.addStyleName( "fa-angle-right" );
-        setText( "Next" );
+        setText( SocialConstants.INSTANCE.Next() );
         add( nextAnchor );
         addStyleName( "next" );
     }
