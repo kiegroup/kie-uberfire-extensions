@@ -27,6 +27,7 @@ import org.gwtbootstrap3.client.ui.MediaList;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
+import org.kie.uberfire.social.activities.client.resources.i18n.SocialConstants;
 import org.kie.uberfire.social.activities.client.widgets.item.SimpleItemWidget;
 import org.kie.uberfire.social.activities.client.widgets.item.SocialItemExpandedWidget;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SimpleItemWidgetModel;
@@ -148,7 +149,7 @@ public class SocialTimelineWidget extends Composite {
     }
 
     private void displayNoEvents() {
-        itemsPanel.add( new Paragraph( "There are no social events...yet!" ) );
+        itemsPanel.add( new Paragraph( SocialConstants.INSTANCE.NoSocialEvents() ) );
     }
 
     interface MyUiBinder extends UiBinder<Widget, SocialTimelineWidget> {

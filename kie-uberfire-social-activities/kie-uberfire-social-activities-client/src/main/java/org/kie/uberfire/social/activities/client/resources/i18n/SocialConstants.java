@@ -25,4 +25,8 @@ public interface SocialConstants extends Messages {
 
     String NoSocialEvents();
 
+    String Next();
+
+    String Previous();
+
 }
