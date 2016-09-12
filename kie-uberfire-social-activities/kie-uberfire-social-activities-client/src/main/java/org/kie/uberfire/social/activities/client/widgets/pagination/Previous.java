@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.kie.uberfire.social.activities.client.resources.i18n.SocialConstants;
+import org.kie.uberfire.social.activities.client.resources.i18n.Constants;
 
 /**
  * PatternFly pager previous link style
@@ -21,7 +21,7 @@ public class Previous extends ListItem {
         previousIcon.addStyleName( "i" );
         previousIcon.addStyleName( "fa" );
         previousIcon.addStyleName( "fa-angle-left" );
-        setText( SocialConstants.INSTANCE.Previous() );
+        setText(Constants.INSTANCE.Previous());
         addStyleName( "previous" );
     }
 

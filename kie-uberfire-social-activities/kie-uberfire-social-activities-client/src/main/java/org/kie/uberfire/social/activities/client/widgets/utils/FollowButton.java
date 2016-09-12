@@ -5,16 +5,16 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.kie.uberfire.social.activities.client.resources.i18n.Constants;
 import org.uberfire.mvp.Command;
 
-/**
- * Created by Cristiano Nicolai.
- */
 public class FollowButton extends Button {
 
     public enum FollowType {FOLLOW, UNFOLLOW}
 
     private final FollowType followType;
+
+    private final Constants constants = Constants.INSTANCE;
 
     public FollowButton( final FollowType followType, final Command command ) {
         this.followType = followType;
@@ -28,7 +28,7 @@ public class FollowButton extends Button {
                 }
             } );
         }
-        setText( followType == FollowType.FOLLOW ? "Follow" : "Unfollow" );
+        setText(followType == FollowType.FOLLOW ? constants.Follow() : constants.Unfollow());
     }
 
 }

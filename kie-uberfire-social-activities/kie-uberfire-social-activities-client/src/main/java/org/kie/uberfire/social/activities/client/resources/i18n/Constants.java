@@ -19,14 +19,40 @@ package org.kie.uberfire.social.activities.client.resources.i18n;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Messages;
 
-public interface SocialConstants extends Messages {
+public interface Constants extends Messages {
 
-    SocialConstants INSTANCE = GWT.create(SocialConstants.class);
+    Constants INSTANCE = GWT.create(Constants.class);
 
     String NoSocialEvents();
 
     String Next();
 
     String Previous();
+
+    String OneWeekAgo();
+
+    String WeeksAgo();
+
+    String Today();
+
+    String DayAgo();
+
+    String DaysAgo();
+
+    String Follow();
+
+    String Unfollow();
+
+    String CurrentlyNotFollowedByAnyUser();
+
+    String CurrentlyNotFollowingAnyUser();
+
+    String SocialUser();
+
+    String Following();
+
+    String Followers();
+
+    String AllUsers();
 
 }
