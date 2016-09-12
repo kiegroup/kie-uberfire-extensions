@@ -35,6 +35,7 @@ import org.gwtbootstrap3.client.ui.ThumbnailPanel;
 import org.gwtbootstrap3.client.ui.constants.ImageType;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.jboss.errai.ioc.client.container.IOC;
+import org.kie.uberfire.social.activities.client.resources.i18n.Constants;
 import org.kie.uberfire.social.activities.client.user.SocialUserImageProvider;
 import org.kie.uberfire.social.activities.client.widgets.utils.FollowButton;
 import org.kie.uberfire.social.activities.client.widgets.utils.FollowButton.FollowType;
@@ -53,6 +54,8 @@ public class UserBoxView extends Composite {
     }
 
     private static HeaderViewBinder uiBinder = GWT.create( HeaderViewBinder.class );
+
+    private static final Constants constants = Constants.INSTANCE;
 
     @UiField
     Caption caption;
@@ -147,7 +150,8 @@ public class UserBoxView extends Composite {
     }
 
     public enum RelationType {
-        CAN_FOLLOW( "Follow" ), UNFOLLOW( "Unfollow" ), ME;
+
+        CAN_FOLLOW(UserBoxView.constants.Follow()), UNFOLLOW(UserBoxView.constants.Unfollow()), ME;
 
         private String label;
 

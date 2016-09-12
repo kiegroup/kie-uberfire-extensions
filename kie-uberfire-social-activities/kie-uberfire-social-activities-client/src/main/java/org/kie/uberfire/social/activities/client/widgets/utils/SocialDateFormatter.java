@@ -17,7 +17,11 @@ package org.kie.uberfire.social.activities.client.widgets.utils;
 
 import java.util.Date;
 
+import org.kie.uberfire.social.activities.client.resources.i18n.Constants;
+
 public class SocialDateFormatter {
+
+    private static final Constants constants = Constants.INSTANCE;
 
     public static String format( Date date ) {
         int diffInDays = diffInDaysFromNow( date );
@@ -39,19 +43,19 @@ public class SocialDateFormatter {
     private static String formatInWeeks( int diffInDays ) {
         int numberOfWeeks = diffInDays / 7;
         if ( numberOfWeeks == 1 || numberOfWeeks == 0 ) {
-            return "1 week ago";
+            return constants.OneWeekAgo();
         } else {
-            return numberOfWeeks + " weeks ago";
+            return numberOfWeeks + " " + constants.WeeksAgo();
         }
     }
 
     private static String formatInDays( int diffInDays ) {
         if ( diffInDays == 0 ) {
-            return "today";
+            return constants.Today();
         } else if ( diffInDays == 1 ) {
-            return diffInDays + " day ago";
+            return diffInDays + " " + constants.DayAgo();
         } else {
-            return diffInDays + " days ago";
+            return diffInDays + " " + constants.DaysAgo();
         }
     }
 

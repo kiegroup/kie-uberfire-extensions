@@ -28,4 +28,31 @@ public interface Constants extends Messages {
     String Next();
 
     String Previous();
+
+    String OneWeekAgo();
+
+    String WeeksAgo();
+
+    String Today();
+
+    String DayAgo();
+
+    String DaysAgo();
+
+    String Follow();
+
+    String Unfollow();
+
+    String CurrentlyNotFollowedByAnyUser();
+
+    String CurrentlyNotFollowingAnyUser();
+
+    String SocialUser();
+
+    String Following();
+
+    String Followers();
+
+    String AllUsers();
+
 }
