@@ -37,6 +37,7 @@ import org.gwtbootstrap3.client.ui.constants.Styles;
 import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.security.shared.api.identity.User;
+import org.kie.uberfire.social.activities.client.resources.i18n.Constants;
 import org.kie.uberfire.social.activities.client.user.SocialUserImageProvider;
 import org.kie.uberfire.social.activities.client.widgets.utils.FollowButton;
 import org.kie.uberfire.social.activities.client.widgets.utils.FollowButton.FollowType;
@@ -49,6 +50,8 @@ import org.uberfire.mvp.Command;
 
 @Dependent
 public class SocialRelationsWidget extends Composite {
+
+    private final Constants constants = Constants.INSTANCE;
 
     @UiField
     Heading title;
@@ -89,7 +92,7 @@ public class SocialRelationsWidget extends Composite {
         MessageBuilder.createCall( new RemoteCallback<SocialUser>() {
             public void callback( SocialUser user ) {
                 socialLoggedUser = user;
-                title.setText( "Social User: " + socialLoggedUser.getName() );
+                title.setText(constants.SocialUser() + ": " + socialLoggedUser.getName());
                 printAllUsers();
             }
         }, SocialUserRepositoryAPI.class ).findSocialUser( loggedUser.getIdentifier() );
@@ -100,7 +103,7 @@ public class SocialRelationsWidget extends Composite {
         followersBadge.setText( String.valueOf( socialLoggedUser.getFollowersName().size() ) );
         if ( socialLoggedUser.getFollowersName().isEmpty() ) {
             final ListGroupItem user = new ListGroupItem();
-            user.setText( "Currently not followed by any user." );
+            user.setText(constants.CurrentlyNotFollowedByAnyUser());
             allfollowers.add( user );
         } else {
             for ( final SocialUser follower : users ) {
@@ -116,7 +119,7 @@ public class SocialRelationsWidget extends Composite {
         followingBadge.setText( String.valueOf( socialLoggedUser.getFollowingName().size() ) );
         if ( socialLoggedUser.getFollowingName().isEmpty() ) {
             final ListGroupItem user = new ListGroupItem();
-            user.setText( "Currently not following any user." );
+            user.setText(constants.CurrentlyNotFollowingAnyUser());
             allfollowing.add( user );
         } else {
             for ( final SocialUser following : users ) {
