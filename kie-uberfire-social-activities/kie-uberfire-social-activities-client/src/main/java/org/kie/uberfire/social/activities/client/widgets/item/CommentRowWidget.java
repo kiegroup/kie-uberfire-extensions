@@ -31,6 +31,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.kie.uberfire.social.activities.client.user.SocialUserImageProvider;
+import org.kie.uberfire.social.activities.client.widgets.item.bundle.SocialBundleHelper;
 import org.kie.uberfire.social.activities.client.widgets.timeline.regular.model.UpdateItem;
 import org.kie.uberfire.social.activities.model.SocialActivitiesEvent;
 import org.kie.uberfire.social.activities.model.SocialUser;
@@ -82,7 +83,7 @@ public class CommentRowWidget extends Composite {
 
     private void createAdditionalInfo( SocialActivitiesEvent event ) {
         final StringBuilder comment = new StringBuilder();
-        comment.append( event.getAdicionalInfos() );
+        comment.append( SocialBundleHelper.getItemDescription( event.getAdicionalInfos() ) );
         comment.append( " " );
         comment.append( FORMATTER.format( event.getTimestamp() ) );
         comment.append( " " );
