@@ -29,6 +29,7 @@ import org.jboss.errai.bus.client.api.base.MessageBuilder;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.uberfire.social.activities.client.resources.i18n.Constants;
 import org.kie.uberfire.social.activities.client.widgets.item.SimpleItemWidget;
+import org.kie.uberfire.social.activities.client.widgets.item.bundle.SocialBundleHelper;
 import org.kie.uberfire.social.activities.client.widgets.item.SocialItemExpandedWidget;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SimpleItemWidgetModel;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SocialItemExpandedWidgetModel;
@@ -90,7 +91,7 @@ public class SocialTimelineWidget extends Composite {
                 event.getLinkTarget(),
                 event.getLinkType(),
                 event.getDescription(),
-                event.getAdicionalInfos(),
+                SocialBundleHelper.getItemDescription( event.getAdicionalInfos() ),
                 model.getSocialUser())
                 .withLinkCommand( model.getLinkCommand() )
                 .withLinkParams( event.getLinkParams() );
@@ -112,7 +113,7 @@ public class SocialTimelineWidget extends Composite {
         SimpleItemWidgetModel rowModel = new SimpleItemWidgetModel( model, event.getType(),
                 event.getTimestamp(),
                 event.getDescription(),
-                event.getAdicionalInfos() )
+                SocialBundleHelper.getItemDescription( event.getAdicionalInfos() ) )
                 .withLinkParams( event.getLinkParams() );
 
         addItemWidget( rowModel );
