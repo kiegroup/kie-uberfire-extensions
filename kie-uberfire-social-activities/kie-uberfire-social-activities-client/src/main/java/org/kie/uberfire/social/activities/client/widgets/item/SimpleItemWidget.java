@@ -32,6 +32,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.jboss.errai.ioc.client.container.IOC;
 import org.kie.uberfire.social.activities.client.user.SocialUserImageProvider;
+import org.kie.uberfire.social.activities.client.widgets.item.bundle.SocialBundleHelper;
 import org.kie.uberfire.social.activities.client.widgets.item.model.LinkCommandParams;
 import org.kie.uberfire.social.activities.client.widgets.item.model.SimpleItemWidgetModel;
 import org.kie.uberfire.social.activities.client.widgets.utils.SocialDateFormatter;
@@ -91,7 +92,8 @@ public class SimpleItemWidget extends Composite {
 
     private Widget createText( SimpleItemWidgetModel model ) {
         final StringBuilder sb = new StringBuilder( " " );
-        sb.append( model.getItemDescription() );
+        sb.append( SocialBundleHelper.getItemDescription( model.getItemDescription() ) );
+        sb.append( " " );
         sb.append( SocialDateFormatter.format( model.getTimestamp() ) );
         return new Text( sb.toString() );
     }

@@ -125,6 +125,11 @@ public class SocialActivitiesEvent implements Serializable {
         for ( String info : additionalInfo ) {
             adicionalInfos += info + " ";
         }
+
+        if ( !adicionalInfos.isEmpty() ) {
+            return adicionalInfos.substring( 0, adicionalInfos.length() - 1 );
+        }
+
         return adicionalInfos;
     }
 
