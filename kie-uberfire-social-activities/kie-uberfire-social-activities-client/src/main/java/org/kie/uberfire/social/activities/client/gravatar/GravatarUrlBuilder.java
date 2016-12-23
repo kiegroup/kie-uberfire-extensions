@@ -21,7 +21,6 @@ import java.security.NoSuchAlgorithmException;
 import com.googlecode.gwt.crypto.bouncycastle.util.encoders.Hex;
 /**
  * Url Builder
- * @author francois wauquier
  */
 public class GravatarUrlBuilder {
 

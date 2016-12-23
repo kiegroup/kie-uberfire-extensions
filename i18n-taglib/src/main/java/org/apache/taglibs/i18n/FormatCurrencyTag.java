@@ -22,7 +22,6 @@ import java.text.NumberFormat;
 /** Formats a {@link Number} instance using the current {@link java.util.Locale} 
   * and the Currency {@link NumberFormat}.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public class FormatCurrencyTag extends FormatTagSupport {

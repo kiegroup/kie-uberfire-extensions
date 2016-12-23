@@ -36,7 +36,6 @@ import javax.servlet.jsp.tagext.TagSupport;
   * If still no {@link java.util.Locale} could be found then the default JVM
   * {@link java.util.Locale} is used.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public class LocaleTag extends TagSupport

@@ -22,7 +22,6 @@ import java.text.Format;
 /** Formats a {@link java.util.Date} instance using the default Date and Time formatter 
   * for the current {@link java.util.Locale}.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public class FormatDateTimeTag extends FormatDateTagSupport   {

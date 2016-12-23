@@ -24,7 +24,6 @@ import java.util.Date;
 /** Formats a {@link java.util.Date} instance using a {@link java.util.Locale} and either a 
   * {@link java.text.DateFormat} or a pattern based {@link SimpleDateFormat}.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public class FormatDateTag extends FormatDateTagSupport {

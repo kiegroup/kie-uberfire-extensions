@@ -23,7 +23,6 @@ import java.util.Date;
 /** Abstract base class which supports the defaulting of the value to 'now' 
   * if no other value is specified. 
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public abstract class FormatDateTagSupport extends FormatTagSupport  {
