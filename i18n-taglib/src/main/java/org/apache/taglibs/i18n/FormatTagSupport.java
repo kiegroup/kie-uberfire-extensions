@@ -33,7 +33,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 /** An abstract base class for the formatting tags to provide 
   * implementation inheritence.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public abstract class FormatTagSupport extends TagSupport {

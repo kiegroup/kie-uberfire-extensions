@@ -31,7 +31,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 /** A simple tag that allows a String to be output with null handling.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public class FormatStringTag extends TagSupport {

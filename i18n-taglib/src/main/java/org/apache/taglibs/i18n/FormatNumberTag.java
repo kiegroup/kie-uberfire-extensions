@@ -27,7 +27,6 @@ import java.util.Locale;
 /** Formats a {@link Number} instance using a {@link java.util.Locale} and the 
   * {@link NumberFormat} or a {@link DecimalFormat} if a pattern is specified.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public class FormatNumberTag extends FormatTagSupport {

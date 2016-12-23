@@ -22,7 +22,6 @@ import java.text.NumberFormat;
 /** Formats a {@link Number} instance using the current {@link java.util.Locale} 
   * and the Percent {@link NumberFormat}.
   *
-  * @author James Strachan
   * @version $Revision: 216689 $
   */
 public class FormatPercentTag extends FormatTagSupport {
