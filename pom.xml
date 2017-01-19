@@ -33,7 +33,6 @@
 
   <modules>
     <module>i18n-taglib</module>
-    <module>kie-uberfire-social-activities</module>
   </modules>
 
   <repositories>
