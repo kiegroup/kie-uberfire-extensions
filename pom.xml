@@ -31,6 +31,10 @@
 
   <name>KIE Extensions to UberFire Framework</name>
 
+  <properties>
+    <enforcer.failOnDuplicatedClasses>true</enforcer.failOnDuplicatedClasses>
+  </properties>
+
   <modules>
     <module>i18n-taglib</module>
   </modules>
