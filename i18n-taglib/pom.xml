@@ -13,6 +13,10 @@
 
   <name>i18n taglib (temporary)</name>
 
+  <properties>
+    <java.module.name>org.kie.uberfire.i18ntaglib</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
