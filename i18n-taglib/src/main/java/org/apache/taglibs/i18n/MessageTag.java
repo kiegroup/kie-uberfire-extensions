@@ -192,9 +192,9 @@ public class MessageTag extends BodyTagSupport
         // Reset the arguments
         if (_arguments != null) {
             _arguments.clear();
-        }
-        if ( _args != null ) {
-            _arguments.addAll(Arrays.asList(_args));
+            if (_args != null) {
+                _arguments.addAll(Arrays.asList(_args));
+            }
         }
 
         // see if the bundle has a value, if not, we default to the tag contents
